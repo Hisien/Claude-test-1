@@ -107,7 +107,7 @@ fun CoachScreen(
 
         // 2. Check-in: "Scrollst du gerade bewusst?"
         SectionCard(stringResource(R.string.coach_check_in_title)) {
-            Text(stringResource(R.string.coach_body_check_in), style = MaterialTheme.typography.bodyLarge)
+            Text(CoachTexts.checkInQuestion(LocalContext.current.resources, voice), style = MaterialTheme.typography.bodyLarge)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                 Button(onClick = { viewModel.answerCheckIn(CheckInAnswer.MINDFUL) }, modifier = Modifier.weight(1f)) {
                     Text(stringResource(R.string.check_in_mindful))
@@ -129,8 +129,11 @@ fun CoachScreen(
         SectionCard(stringResource(R.string.follow_up_title)) {
             val used = snapshot.today?.total
             Text(
-                if (used != null && !used.isZero) stringResource(R.string.follow_up_mood, durationText(used))
-                else stringResource(R.string.follow_up_mood_no_data),
+                CoachTexts.moodQuestion(
+                    LocalContext.current.resources,
+                    voice,
+                    if (used != null && !used.isZero) durationText(used) else null,
+                ),
                 style = MaterialTheme.typography.bodyLarge,
             )
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
@@ -138,7 +141,7 @@ fun CoachScreen(
                 OutlinedButton(onClick = { viewModel.answerMood(MoodAfterScroll.SAME) }, modifier = Modifier.weight(1f)) { Text(stringResource(R.string.mood_same)) }
                 OutlinedButton(onClick = { viewModel.answerMood(MoodAfterScroll.TIRED) }, modifier = Modifier.weight(1f)) { Text(stringResource(R.string.mood_tired)) }
             }
-            Text(stringResource(R.string.follow_up_intent), style = MaterialTheme.typography.bodyLarge)
+            Text(CoachTexts.intentQuestion(LocalContext.current.resources, voice), style = MaterialTheme.typography.bodyLarge)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                 OutlinedButton(onClick = { viewModel.answerIntent(ScrollIntent.DISTRACTION) }, modifier = Modifier.weight(1f)) { Text(stringResource(R.string.intent_distraction), maxLines = 1) }
                 OutlinedButton(onClick = { viewModel.answerIntent(ScrollIntent.BOREDOM) }, modifier = Modifier.weight(1f)) { Text(stringResource(R.string.intent_boredom), maxLines = 1) }

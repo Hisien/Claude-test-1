@@ -32,6 +32,7 @@ import com.scrollmate.app.ui.components.EmptyState
 import com.scrollmate.app.ui.components.ErrorState
 import com.scrollmate.app.ui.components.LoadingState
 import com.scrollmate.app.ui.components.PermissionCard
+import com.scrollmate.app.ui.components.AppIcons
 import com.scrollmate.app.ui.components.GlowCard
 import com.scrollmate.app.ui.components.glass
 import com.scrollmate.app.ui.theme.HeroNumber
@@ -228,7 +229,7 @@ private fun NextUpSection(
     val windDownValue = if (wd.enabled) stringResource(R.string.tile_from, WindDown.start(wd).hhmm()) else stringResource(R.string.tile_off)
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         Tile(
-            icon = Icons.Filled.Face,
+            icon = AppIcons.ChatSmall,
             iconTint = Color(0xFF7DD3FC),
             label = stringResource(R.string.tile_check_in),
             value = checkInValue,
@@ -236,7 +237,7 @@ private fun NextUpSection(
             modifier = Modifier.weight(1f),
         )
         Tile(
-            icon = Icons.Filled.DateRange,
+            icon = AppIcons.Moon,
             iconTint = Color(0xFFC4B5FD),
             label = stringResource(R.string.tile_wind_down),
             value = windDownValue,

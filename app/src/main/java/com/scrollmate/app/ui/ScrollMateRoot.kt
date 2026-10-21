@@ -32,6 +32,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
+import com.scrollmate.app.ui.components.AppIcons
 import com.scrollmate.app.ui.components.GlassBackground
 import com.scrollmate.app.ui.components.glass
 import com.scrollmate.app.ui.theme.LocalGlass
@@ -81,12 +82,12 @@ import com.scrollmate.app.ui.screens.TodayScreen
 import com.scrollmate.core.model.CoachVoice
 import kotlinx.coroutines.delay
 
-enum class Tab(@StringRes val label: Int, val icon: ImageVector) {
-    TODAY(R.string.tab_today, Icons.Filled.Home),
-    COACH(R.string.tab_coach, Icons.Filled.Face),
-    FOCUS(R.string.tab_focus, Icons.Filled.PlayArrow),
-    HISTORY(R.string.tab_history, Icons.Filled.DateRange),
-    SETTINGS(R.string.tab_settings, Icons.Filled.Settings),
+enum class Tab(@StringRes val label: Int, val icon: ImageVector, val selectedIcon: ImageVector) {
+    TODAY(R.string.tab_today, AppIcons.Today, AppIcons.TodayFilled),
+    COACH(R.string.tab_coach, AppIcons.Coach, AppIcons.CoachFilled),
+    FOCUS(R.string.tab_focus, AppIcons.Focus, AppIcons.FocusFilled),
+    HISTORY(R.string.tab_history, AppIcons.History, AppIcons.HistoryFilled),
+    SETTINGS(R.string.tab_settings, AppIcons.Settings, AppIcons.SettingsFilled),
 }
 
 /** Callbacks for system screens and permissions, shared by onboarding and settings. */
@@ -178,6 +179,7 @@ private fun MainScaffold(
     GlassBackground {
     Scaffold(
         containerColor = Color.Transparent,
+        contentColor = MaterialTheme.colorScheme.onBackground,
         topBar = {
             GlassHeader(
                 title = title,
@@ -306,7 +308,7 @@ private fun GlassHeader(
                         Text(if (unread > 99) "99+" else unread.toString())
                     }
                 }) {
-                    Icon(Icons.Filled.Notifications, contentDescription = bellDescription)
+                    Icon(AppIcons.Bell, contentDescription = bellDescription, modifier = Modifier.size(22.dp))
                 }
             }
         }
@@ -345,7 +347,7 @@ private fun GlassNavBar(selected: Tab?, onSelect: (Tab) -> Unit) {
                 verticalArrangement = Arrangement.Center,
             ) {
                 Icon(
-                    t.icon,
+                    if (active) t.selectedIcon else t.icon,
                     contentDescription = null,
                     tint = if (active) MaterialTheme.colorScheme.primary else g.textMuted,
                     modifier = Modifier.size(22.dp),

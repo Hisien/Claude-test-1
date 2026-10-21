@@ -34,7 +34,10 @@ object CoachTexts {
         val voiced = voicedBody(m.kind, voice)
         val body = if (voiced != null) {
             when (m.kind) {
-                MessageKind.THRESHOLD_REACHED -> res.getString(voiced, pct)
+                MessageKind.THRESHOLD_REACHED, MessageKind.DAILY_ON_TRACK, MessageKind.DAILY_NEAR_LIMIT,
+                MessageKind.GENTLE_TIP -> res.getString(voiced, pct)
+                MessageKind.DAILY_OVER_LIMIT -> res.getString(voiced, pct, minutes)
+                MessageKind.CHECK_IN_REPLY_AUTOPILOT -> res.getString(voiced, minutes)
                 MessageKind.LIMIT_REACHED_SUGGEST_FOCUS, MessageKind.STRICT_REPEAT,
                 MessageKind.FOCUS_COMPLETED, MessageKind.FOCUS_ENDED_EARLY -> res.getString(voiced, minutes)
                 MessageKind.APP_LIMIT_REACHED -> res.getString(voiced, app)
@@ -98,7 +101,21 @@ object CoachTexts {
         MessageKind.FOCUS_COMPLETED -> pick(voice, R.string.v_mouse_focus_done, R.string.v_harsh_focus_done, R.string.v_casual_focus_done, R.string.v_neutral_focus_done, R.string.v_aggressive_focus_done)
         MessageKind.FOCUS_ENDED_EARLY -> pick(voice, R.string.v_mouse_focus_early, R.string.v_harsh_focus_early, R.string.v_casual_focus_early, R.string.v_neutral_focus_early, R.string.v_aggressive_focus_early)
         MessageKind.WIND_DOWN -> pick(voice, R.string.v_mouse_wind_down, R.string.v_harsh_wind_down, R.string.v_casual_wind_down, R.string.v_neutral_wind_down, R.string.v_aggressive_wind_down)
-        else -> null
+        MessageKind.CHECK_IN_REPLY_MINDFUL -> pick(voice, R.string.v_mouse_mindful, R.string.v_harsh_mindful, R.string.v_casual_mindful, R.string.v_neutral_mindful, R.string.v_aggressive_mindful)
+        MessageKind.CHECK_IN_REPLY_AUTOPILOT -> pick(voice, R.string.v_mouse_autopilot, R.string.v_harsh_autopilot, R.string.v_casual_autopilot, R.string.v_neutral_autopilot, R.string.v_aggressive_autopilot)
+        MessageKind.MOOD_BETTER -> pick(voice, R.string.v_mouse_mood_better, R.string.v_harsh_mood_better, R.string.v_casual_mood_better, R.string.v_neutral_mood_better, R.string.v_aggressive_mood_better)
+        MessageKind.MOOD_SAME -> pick(voice, R.string.v_mouse_mood_same, R.string.v_harsh_mood_same, R.string.v_casual_mood_same, R.string.v_neutral_mood_same, R.string.v_aggressive_mood_same)
+        MessageKind.MOOD_TIRED -> pick(voice, R.string.v_mouse_mood_tired, R.string.v_harsh_mood_tired, R.string.v_casual_mood_tired, R.string.v_neutral_mood_tired, R.string.v_aggressive_mood_tired)
+        MessageKind.INTENT_DISTRACTION -> pick(voice, R.string.v_mouse_intent_distraction, R.string.v_harsh_intent_distraction, R.string.v_casual_intent_distraction, R.string.v_neutral_intent_distraction, R.string.v_aggressive_intent_distraction)
+        MessageKind.INTENT_BOREDOM -> pick(voice, R.string.v_mouse_intent_boredom, R.string.v_harsh_intent_boredom, R.string.v_casual_intent_boredom, R.string.v_neutral_intent_boredom, R.string.v_aggressive_intent_boredom)
+        MessageKind.INTENT_INFORMATION -> pick(voice, R.string.v_mouse_intent_information, R.string.v_harsh_intent_information, R.string.v_casual_intent_information, R.string.v_neutral_intent_information, R.string.v_aggressive_intent_information)
+        MessageKind.INTENT_CONNECTION -> pick(voice, R.string.v_mouse_intent_connection, R.string.v_harsh_intent_connection, R.string.v_casual_intent_connection, R.string.v_neutral_intent_connection, R.string.v_aggressive_intent_connection)
+        MessageKind.DAILY_NO_DATA -> pick(voice, R.string.v_mouse_no_data, R.string.v_harsh_no_data, R.string.v_casual_no_data, R.string.v_neutral_no_data, R.string.v_aggressive_no_data)
+        MessageKind.DAILY_ON_TRACK -> pick(voice, R.string.v_mouse_sum_on_track, R.string.v_harsh_sum_on_track, R.string.v_casual_sum_on_track, R.string.v_neutral_sum_on_track, R.string.v_aggressive_sum_on_track)
+        MessageKind.DAILY_NEAR_LIMIT -> pick(voice, R.string.v_mouse_near, R.string.v_harsh_near, R.string.v_casual_near, R.string.v_neutral_near, R.string.v_aggressive_near)
+        MessageKind.DAILY_OVER_LIMIT -> pick(voice, R.string.v_mouse_over, R.string.v_harsh_over, R.string.v_casual_over, R.string.v_neutral_over, R.string.v_aggressive_over)
+        MessageKind.GENTLE_TIP -> pick(voice, R.string.v_mouse_gentle_tip, R.string.v_harsh_gentle_tip, R.string.v_casual_gentle_tip, R.string.v_neutral_gentle_tip, R.string.v_aggressive_gentle_tip)
+        MessageKind.GENTLE_OVER_LIMIT -> pick(voice, R.string.v_mouse_gentle_over, R.string.v_harsh_gentle_over, R.string.v_casual_gentle_over, R.string.v_neutral_gentle_over, R.string.v_aggressive_gentle_over)
     }
 
     private fun pick(voice: CoachVoice, mouse: Int, harsh: Int, casual: Int, neutral: Int, aggressive: Int): Int = when (voice) {
@@ -135,6 +152,20 @@ object CoachTexts {
         CoachVoice.NEUTRAL -> R.string.voice_neutral_desc
         CoachVoice.AGGRESSIVE -> R.string.voice_aggressive_desc
     }
+
+    /** The check-in question in the selected voice. */
+    fun checkInQuestion(res: Resources, voice: CoachVoice): String =
+        res.getString(voicedBody(MessageKind.CHECK_IN, voice)!!)
+
+    /** "Fühlst du dich nach dem Scrollen besser oder müder?" in the selected voice; [used] e.g. "1 Std. 27 Min.". */
+    fun moodQuestion(res: Resources, voice: CoachVoice, used: String?): String = if (used != null) {
+        res.getString(pick(voice, R.string.v_mouse_q_mood, R.string.v_harsh_q_mood, R.string.v_casual_q_mood, R.string.v_neutral_q_mood, R.string.v_aggressive_q_mood), used)
+    } else {
+        res.getString(pick(voice, R.string.v_mouse_q_mood_none, R.string.v_harsh_q_mood_none, R.string.v_casual_q_mood_none, R.string.v_neutral_q_mood_none, R.string.v_aggressive_q_mood_none))
+    }
+
+    fun intentQuestion(res: Resources, voice: CoachVoice): String =
+        res.getString(pick(voice, R.string.v_mouse_q_intent, R.string.v_harsh_q_intent, R.string.v_casual_q_intent, R.string.v_neutral_q_intent, R.string.v_aggressive_q_intent))
 
     /** Example line shown in the voice picker (the 70 % reminder). */
     fun voiceExample(res: Resources, voice: CoachVoice): String =
