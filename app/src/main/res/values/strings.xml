@@ -139,7 +139,7 @@
 
     <!-- Focus -->
     <string name="focus_no_blocking">Andere Apps werden nicht gesperrt. Eine Fokus-Session ist ein Timer in ScrollMate, der dich beim Dranbleiben unterstützt.</string>
-    <string name="focus_restriction_unavailable">Eine echte App-Sperre ist bewusst nicht Teil dieser Version.</string>
+    <string name="focus_restriction_unavailable">Eine Sperre gibt es nur abends im Abendmodus (Einstellungen).</string>
     <string name="focus_start_title">Fokus-Session</string>
     <string name="focus_start_body">Leg das Handy weg und mach etwas anderes – ScrollMate zählt mit und meldet sich am Ende.</string>
     <string name="focus_duration">Dauer</string>
@@ -158,7 +158,7 @@
     <string name="history_chart_title">Letzte 7 Tage</string>
     <string name="history_empty">Für die letzten 7 Tage gibt es noch keine Daten.</string>
     <string name="history_goal_days">An %1$d von %2$d Tagen im Rahmen deines Ziels.</string>
-    <string name="history_legend">Grün: im Ziel · Sandfarben: darüber · gestrichelte Linie: dein Tageslimit</string>
+    <string name="history_legend">Grün: im Ziel · Rot: darüber · gestrichelte Linie: dein Tageslimit</string>
     <string name="history_average_title">Dein Durchschnitt</string>
     <string name="history_average_demo">Im Demo-Modus gibt es keinen Vergleich mit einem persönlichen Durchschnitt.</string>
     <string name="history_average_not_yet">Den Vergleich mit deinem Durchschnitt zeige ich ab %1$d abgeschlossenen Tagen mit Live-Daten (bisher: %2$d). Mit weniger Tagen wäre er wenig aussagekräftig.</string>
@@ -211,7 +211,7 @@
     <string name="delete_confirm_title">Alle Daten löschen?</string>
     <string name="delete_confirm_body">Nutzungsverlauf, Fokus-Sessions, Notizen und Einstellungen werden von diesem Gerät gelöscht. Danach startet ScrollMate wieder mit dem Onboarding.</string>
     <string name="settings_about_title">Über ScrollMate</string>
-    <string name="settings_about_body">ScrollMate sperrt keine anderen Apps. Es hat keinen Internetzugriff, braucht kein Konto, und alle Daten bleiben auf deinem Gerät.</string>
+    <string name="settings_about_body">ScrollMate sperrt Apps nur, wenn du den Abendmodus einschaltest. Es hat keinen Internetzugriff, braucht kein Konto, und alle Daten bleiben auf deinem Gerät.</string>
 
     <!-- Rules -->
     <string name="rule_threshold_total">Erinnerungen an den Warnschwellen</string>
@@ -235,7 +235,7 @@
     <string name="onboarding_welcome_title">Willkommen bei ScrollMate</string>
     <string name="onboarding_welcome_1">Ein freundlicher Coach, der dir hilft, bewusster mit deinem Handy umzugehen – ohne Schuldgefühle.</string>
     <string name="onboarding_welcome_2">Du bestimmst Ziel, Limit und wie deutlich du erinnert werden möchtest.</string>
-    <string name="onboarding_welcome_3">Ehrlich: ScrollMate erinnert und begleitet, sperrt aber keine anderen Apps.</string>
+    <string name="onboarding_welcome_3">Ehrlich: ScrollMate erinnert und begleitet. Gesperrt wird nur abends – und nur, wenn du den Abendmodus einschaltest.</string>
     <string name="onboarding_goal_title">Dein Ziel</string>
     <string name="onboarding_goal_hint">Persönliches Ziel, z. B. „Abends weniger scrollen“ (optional)</string>
     <string name="onboarding_goal_note">Du kannst Ziel und Limit jederzeit in den Einstellungen ändern.</string>
@@ -253,4 +253,187 @@
     <string name="notification_channel_coach">Coach</string>
     <string name="notification_channel_coach_desc">Freundliche Erinnerungen an deine selbst gesetzten Ziele und den täglichen Check-in.</string>
     <string name="notification_demo_prefix">%1$s (Demo)</string>
+    <!-- ===== Voices (Tonalität) ===== -->
+    <string name="voice_mouse">Mausig 🐭</string>
+    <string name="voice_mouse_desc">Süß, fürsorglich und verspielt – mal kurz, mal ausführlicher.</string>
+    <string name="voice_harsh">Harsch 🔥</string>
+    <string name="voice_harsh_desc">Konfrontativ und ultrakurz. Disziplin ohne Ausreden.</string>
+    <string name="voice_casual">Lässig 🕶️</string>
+    <string name="voice_casual_desc">Kumpelhaft, entspannt und ermutigend auf Augenhöhe.</string>
+    <string name="voice_neutral">Neutral 🤖</string>
+    <string name="voice_neutral_desc">Sachlich, faktenbasiert und frei von Emotionen.</string>
+    <string name="voice_aggressive">Aggressiv 💥</string>
+    <string name="voice_aggressive_desc">Laut, extrem direkt, maximale Dringlichkeit.</string>
+    <string name="settings_voice_title">Tonalität deines Coaches</string>
+    <string name="settings_voice_desc">Bestimmt, wie Erinnerungen klingen. Der Coaching-Stil oben bestimmt, wann sie kommen.</string>
+    <string name="settings_voice_example">Beispiel: %1$s</string>
+
+    <string name="v_mouse_threshold">Psst … %1$d %% geschafft, Mäuschen! 🐭 Zeit für ’ne kleine Pause?</string>
+    <string name="v_mouse_limit">Ohoh, Limit erreicht! 🧀 Du hast heute schon so fleißig gescrollt. Leg das Handy jetzt an die Seite, du Fleißmaus!</string>
+    <string name="v_mouse_limit_focus">Ohoh, Limit erreicht! 🧀 Magst du eine %1$d-minütige Fokus-Session mit mir machen, du Fleißmaus?</string>
+    <string name="v_mouse_repeat">Piep! Du bist immer noch über deinem Limit. 🐭 Wie wär’s mit %1$d Minuten Fokus-Zeit?</string>
+    <string name="v_mouse_app_limit">Mäuschen, für %1$s ist für heute Schluss. 🧀 Gönn dir lieber was Schönes!</string>
+    <string name="v_mouse_check_in">Psst … kurzer Check-in: Scrollst du gerade bewusst? 🐭</string>
+    <string name="v_mouse_on_track">Du liegst super im Rahmen, Mäuschen! 🧀 Was hat dir heute geholfen?</string>
+    <string name="v_mouse_focus_done">%1$d Minuten Fokus – du kleine Heldenmaus! 🐭 Was hat dir geholfen?</string>
+    <string name="v_mouse_focus_early">%1$d Minuten fokussiert – jede Minute zählt, Mäuschen! 🧀</string>
+    <string name="v_mouse_wind_down">Gähn … um %1$s ist Schlafenszeit. 🐭 Zeit, das Nest gemütlich zu machen.</string>
+
+    <string name="v_harsh_threshold">%1$d %% weg. Null Selbstbeherrschung. Weg das Teil!</string>
+    <string name="v_harsh_limit">Limit erreicht. Handy AUS. Jetzt!</string>
+    <string name="v_harsh_limit_focus">Limit erreicht. %1$d Minuten Fokus. Jetzt!</string>
+    <string name="v_harsh_repeat">Immer noch drüber. %1$d Minuten Fokus. Keine Ausreden.</string>
+    <string name="v_harsh_app_limit">%1$s: Limit voll. Schließen.</string>
+    <string name="v_harsh_check_in">Scrollst du bewusst? Ehrlich.</string>
+    <string name="v_harsh_on_track">Im Rahmen. Weiter so.</string>
+    <string name="v_harsh_focus_done">%1$d Minuten Fokus. Gut. Nächstes Mal mehr.</string>
+    <string name="v_harsh_focus_early">Abgebrochen nach %1$d Minuten. Morgen durchziehen.</string>
+    <string name="v_harsh_wind_down">Schlafenszeit %1$s. Handy weg.</string>
+
+    <string name="v_casual_threshold">%1$d %% erreicht! Zeit für ’nen Shake-out, Bro/Sis 🤙</string>
+    <string name="v_casual_limit">Limit voll! Mach dir kein Stress, morgen weiter 😎</string>
+    <string name="v_casual_limit_focus">Limit voll! Wie wär’s mit %1$d Minuten Fokus? Easy 😎</string>
+    <string name="v_casual_repeat">Immer noch drüber – alles cool. %1$d Minuten Fokus wären nice 🤙</string>
+    <string name="v_casual_app_limit">%1$s hat dich heute genug gesehen 😎 Chill mal was anderes.</string>
+    <string name="v_casual_check_in">Kurzer Vibe-Check: Scrollst du gerade bewusst? 🤙</string>
+    <string name="v_casual_on_track">Läuft heute! Was hat dir geholfen? 😎</string>
+    <string name="v_casual_focus_done">%1$d Minuten Fokus – stark! 🤙</string>
+    <string name="v_casual_focus_early">%1$d Minuten geschafft – passt schon, jede Minute zählt 😎</string>
+    <string name="v_casual_wind_down">Um %1$s ist Schlafenszeit – Zeit zum Runterfahren 🌙</string>
+
+    <string name="v_neutral_threshold">%1$d %% des Tageslimits erreicht.</string>
+    <string name="v_neutral_limit">Tageslimit erreicht. Bitte Apps schließen.</string>
+    <string name="v_neutral_limit_focus">Tageslimit erreicht. Fokus-Session (%1$d Min.) verfügbar.</string>
+    <string name="v_neutral_repeat">Tageslimit weiterhin überschritten. Fokus-Session (%1$d Min.) verfügbar.</string>
+    <string name="v_neutral_app_limit">Limit für %1$s erreicht.</string>
+    <string name="v_neutral_check_in">Check-in: Nutzt du das Gerät gerade bewusst?</string>
+    <string name="v_neutral_on_track">Tagesziel eingehalten.</string>
+    <string name="v_neutral_focus_done">Fokus-Session abgeschlossen: %1$d Min.</string>
+    <string name="v_neutral_focus_early">Fokus-Session beendet nach %1$d Min.</string>
+    <string name="v_neutral_wind_down">Schlafenszeit um %1$s. Abendmodus aktiv.</string>
+
+    <string name="v_aggressive_threshold">SCHON %1$d %%! LEG DAS TEIL WEG!</string>
+    <string name="v_aggressive_limit">LIMIT ERREICHT! REICHT JETZT!</string>
+    <string name="v_aggressive_limit_focus">LIMIT ERREICHT! %1$d MINUTEN FOKUS – SOFORT!</string>
+    <string name="v_aggressive_repeat">IMMER NOCH DRÜBER! %1$d MINUTEN FOKUS! LOS!</string>
+    <string name="v_aggressive_app_limit">%1$s IST DURCH! ZUMACHEN!</string>
+    <string name="v_aggressive_check_in">SCROLLST DU GERADE BEWUSST?!</string>
+    <string name="v_aggressive_on_track">IM RAHMEN! WEITER SO!</string>
+    <string name="v_aggressive_focus_done">%1$d MINUTEN FOKUS! STARK!</string>
+    <string name="v_aggressive_focus_early">NUR %1$d MINUTEN?! MORGEN LÄNGER!</string>
+    <string name="v_aggressive_wind_down">%1$s IST SCHLAFENSZEIT! HANDY WEG!</string>
+
+    <!-- ===== Theme ===== -->
+    <string name="settings_theme_title">Erscheinungsbild</string>
+    <string name="theme_system">Wie im System</string>
+    <string name="theme_light">Hell</string>
+    <string name="theme_dark">Dunkel</string>
+
+    <!-- ===== Limit zones ===== -->
+    <string name="zone_safe">Sicherer Bereich</string>
+    <string name="zone_warning">Warnstufe</string>
+    <string name="zone_exceeded">Limit überschritten</string>
+    <string name="cd_zone">Status: %1$s</string>
+
+    <!-- ===== Health coach ===== -->
+    <string name="action_try_alternative">Alternative ausprobieren</string>
+    <string name="alternatives_title">Statt zu scrollen</string>
+    <string name="alternatives_desc">Eine Minute für dich – such dir etwas aus:</string>
+    <string name="alternatives_suggested">Vorschlag gerade: %1$s</string>
+    <string name="alt_breathing">4-7-8-Atmung</string>
+    <string name="alt_breathing_how">4 Sekunden durch die Nase einatmen, 7 Sekunden halten, 8 Sekunden langsam durch den Mund ausatmen. 4 Runden.</string>
+    <string name="alt_squats">10 Kniebeugen oder Liegestütze</string>
+    <string name="alt_squats_how">Steh auf und mach 10 Kniebeugen oder Liegestütze – bringt den Kreislauf kurz in Schwung.</string>
+    <string name="alt_water">Ein Glas Wasser trinken</string>
+    <string name="alt_water_how">Steh auf, hol dir ein Glas Wasser und trink es in Ruhe.</string>
+    <string name="alt_stretch">2 Minuten dehnen</string>
+    <string name="alt_stretch_how">Schultern kreisen, Nacken sanft zur Seite neigen, Arme über den Kopf strecken – 2 Minuten lang.</string>
+    <string name="alt_window">Blick aus dem Fenster</string>
+    <string name="alt_window_how">Schau eine Minute lang in die Ferne. Das entspannt die Augen nach dem vielen Nah-Sehen.</string>
+    <string name="action_start_breathing">Atemübung starten</string>
+    <string name="action_stop_breathing">Atemübung beenden</string>
+    <string name="breathing_in">Einatmen …</string>
+    <string name="breathing_hold">Halten …</string>
+    <string name="breathing_out">Ausatmen …</string>
+    <string name="cd_breathing">Atemkreis, aktuelle Phase: %1$s</string>
+
+    <string name="sleep_title">Schlaf-Coach</string>
+    <string name="sleep_desc">Wobei kann ich dir helfen?</string>
+    <string name="sleep_q_why">Warum schlafe ich nach dem Handy schlechter?</string>
+    <string name="sleep_a_why">Helles, bläuliches Bildschirmlicht am Abend kann die Ausschüttung von Melatonin, dem Schlafhormon, verzögern. Dazu kommt: Feeds liefern ständig kleine Belohnungen und neue Reize. Das hält das Gehirn wach und aktiv – genau dann, wenn es eigentlich runterfahren will.</string>
+    <string name="sleep_q_fall_asleep">Was hilft beim Einschlafen?</string>
+    <string name="sleep_a_fall_asleep">Ein kühles Schlafzimmer (etwa 16–18 °C), gedimmtes Licht in der letzten Stunde, möglichst feste Schlafenszeiten und 30–60 Minuten Digital Detox vor dem Schlafen. Vielen hilft es, das Handy außerhalb des Schlafzimmers zu laden.</string>
+    <string name="sleep_q_thoughts">Meine Gedanken kreisen</string>
+    <string name="sleep_a_thoughts">Probier einen Brain-Dump: Schreib 5 Minuten lang auf Papier alles auf, was dir durch den Kopf geht – To-dos, Sorgen, Ideen. Was aufgeschrieben ist, muss dein Kopf nicht mehr festhalten. Danach ein paar Runden 4-7-8-Atmung.</string>
+    <string name="sleep_q_night">Ich wache nachts auf und greife zum Handy</string>
+    <string name="sleep_a_night">Leg das Handy über Nacht außer Reichweite. Wenn du wach liegst: kein Bildschirm, sondern ruhig atmen – oder kurz aufstehen und bei gedämpftem Licht etwas auf Papier lesen, bis du wieder müde wirst.</string>
+    <string name="sleep_disclaimer">Allgemeine Tipps, keine medizinische Beratung. Wenn du über Wochen schlecht schläfst, sprich mit einer Ärztin oder einem Arzt.</string>
+
+    <string name="follow_up_title">Kurz nachgespürt</string>
+    <string name="follow_up_mood">Fühlst du dich nach dem Scrollen heute (%1$s) besser oder müder?</string>
+    <string name="follow_up_mood_no_data">Fühlst du dich nach dem Scrollen gerade besser oder müder?</string>
+    <string name="mood_better">Besser</string>
+    <string name="mood_same">Gleich</string>
+    <string name="mood_tired">Müder</string>
+    <string name="follow_up_intent">Was hast du gerade gesucht?</string>
+    <string name="intent_distraction">Ablenkung</string>
+    <string name="intent_boredom">Langeweile</string>
+    <string name="intent_information">Infos</string>
+    <string name="intent_connection">Kontakt</string>
+    <string name="mood_reply_better">Schön! Dann hat es dir gerade gutgetan.</string>
+    <string name="mood_reply_same">Okay. Wenn es dir nichts gebracht hat, probier doch mal eine kurze Alternative.</string>
+    <string name="mood_reply_tired">Danke, dass du hinspürst. Müdigkeit nach dem Scrollen ist häufig – vielleicht hilft jetzt Bewegung oder frische Luft?</string>
+    <string name="intent_reply_distraction">Verständlich. Manchmal braucht der Kopf eine Pause – eine echte Pause erholt oft mehr als der Feed.</string>
+    <string name="intent_reply_boredom">Langeweile ist oft ein Zeichen, dass der Körper Bewegung möchte. Wie wär’s mit einer kleinen Alternative?</string>
+    <string name="intent_reply_information">Gut, wenn du gefunden hast, was du gesucht hast. Ein kurzer Stopp danach hilft, nicht einfach weiterzuscrollen.</string>
+    <string name="intent_reply_connection">Kontakt zu anderen ist wertvoll. Vielleicht passt heute auch ein kurzer Anruf statt Feed?</string>
+
+    <!-- ===== Wind-down ===== -->
+    <string name="coach_title_wind_down">Abendmodus</string>
+    <string name="settings_wind_down_title">Abendmodus (Schlafenszeit-Sperre)</string>
+    <string name="settings_wind_down_desc">Ab %1$d Minuten vor deiner Schlafenszeit bis zur Aufstehzeit werden die gewählten Apps mit einem ruhigen Vollbild und einer Atemübung abgedeckt.</string>
+    <string name="settings_wind_down_switch">Abendmodus aktivieren</string>
+    <string name="settings_bedtime">Schlafenszeit: %1$s</string>
+    <string name="settings_wake_time">Aufstehzeit: %1$s</string>
+    <string name="settings_wind_down_lead">Vorlauf vor der Schlafenszeit</string>
+    <string name="settings_wind_down_window">Gesperrt von %1$s bis %2$s</string>
+    <string name="settings_wind_down_apps">Gesperrte Apps</string>
+    <string name="settings_wind_down_apps_count">%1$d Apps werden abends abgedeckt</string>
+    <string name="settings_wind_down_apps_none">Noch keine Apps ausgewählt – wähle unten mindestens eine.</string>
+    <string name="settings_overlay_ok">„Über anderen Apps einblenden“ ist erlaubt.</string>
+    <string name="settings_overlay_missing">Für die Sperre braucht ScrollMate die Erlaubnis „Über anderen Apps einblenden“.</string>
+    <string name="action_allow_overlay">Einblenden über anderen Apps erlauben</string>
+    <string name="settings_wind_down_needs_usage">Außerdem nötig: Zugriff auf Nutzungsdaten (oben unter „Daten und Berechtigungen“), damit ScrollMate erkennt, welche App offen ist.</string>
+    <string name="settings_wind_down_ready">Abendmodus ist bereit.</string>
+    <string name="settings_wind_down_paused">Heute Abend ausgesetzt.</string>
+    <string name="action_resume_tonight">Heute Abend wieder einschalten</string>
+    <string name="settings_wind_down_note">Hinweis: ScrollMate prüft abends etwa jede Sekunde, welche App offen ist. Das kostet etwas Akku. Eine dauerhafte Benachrichtigung zeigt, dass der Abendmodus bereit ist.</string>
+
+    <string name="wind_down_service_title">Abendmodus ist bereit</string>
+    <string name="wind_down_service_text">Gewählte Apps werden zur Schlafenszeit sanft abgedeckt.</string>
+    <string name="notification_channel_wind_down">Abendmodus</string>
+    <string name="notification_channel_wind_down_desc">Zeigt an, dass der Abendmodus bereit ist.</string>
+    <string name="wind_down_overlay_title">Zeit zum Runterfahren</string>
+    <string name="wind_down_overlay_body">Um %1$s ist Schlafenszeit. %2$s macht bis morgen früh Pause.</string>
+    <string name="wind_down_overlay_body_generic">Um %1$s ist Schlafenszeit. Diese App macht bis morgen früh Pause.</string>
+    <string name="wind_down_overlay_breathing_hint">Atme mit dem Kreis: 4 ein, 7 halten, 8 aus.</string>
+    <string name="wind_down_overlay_breathing_cd">Atemkreis für die 4-7-8-Atmung</string>
+    <string name="wind_down_overlay_home">Zum Startbildschirm</string>
+    <string name="wind_down_overlay_pause">Heute Abend aussetzen</string>
+
+    <!-- ===== Categories ===== -->
+    <string name="history_view_days">Tage</string>
+    <string name="history_view_categories">Kategorien</string>
+    <string name="categories_title">Nutzung nach Kategorien</string>
+    <string name="categories_today">Heute</string>
+    <string name="categories_week">7 Tage</string>
+    <string name="categories_empty">Für diesen Zeitraum gibt es noch keine Nutzung.</string>
+    <string name="categories_row">%1$s · %2$d %%</string>
+    <string name="categories_apps">Apps: %1$s</string>
+    <string name="cat_social">Soziales &amp; Social Media</string>
+    <string name="cat_entertainment">Unterhaltung</string>
+    <string name="cat_work">Arbeit &amp; Lernen</string>
+    <string name="cat_news">Informationsmedien &amp; News</string>
+    <string name="cat_other">Sonstiges</string>
+    <string name="categories_note">Die Zuordnung nutzt bekannte Apps und die Kategorie, die eine App selbst angibt.</string>
 </resources>

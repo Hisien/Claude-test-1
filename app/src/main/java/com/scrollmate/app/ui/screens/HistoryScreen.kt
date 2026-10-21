@@ -1,6 +1,25 @@
 package com.scrollmate.app.ui.screens
 
 import androidx.compose.foundation.Canvas
+import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
+import com.scrollmate.core.categories.AppCategory
+import com.scrollmate.core.categories.CategoryClassifier
+import com.scrollmate.app.ui.theme.ZoneColors
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -55,6 +74,12 @@ fun HistoryScreen(
         }
         else -> ScreenColumn(modifier) {
             if (snapshot.isDemo) DemoNotice()
+            var showCategories by rememberSaveable { mutableStateOf(false) }
+            HistoryViewToggle(showCategories) { showCategories = it }
+            if (showCategories) {
+                CategoriesSection(snapshot)
+                return@ScreenColumn
+            }
             val history = snapshot.history ?: return@ScreenColumn
             val days = history.days
             val withData = days.count { it.total != null }
@@ -106,8 +131,8 @@ fun HistoryScreen(
 
 @Composable
 private fun WeekChart(days: List<DayBar>) {
-    val primary = MaterialTheme.colorScheme.primary
-    val over = MaterialTheme.colorScheme.tertiary
+    val primary = ZoneColors.Safe
+    val over = ZoneColors.Exceeded
     val limitColor = MaterialTheme.colorScheme.outline
     val maxMinutes = (days.mapNotNull { it.total?.toMinutes() } + days.first().limit.toMinutes())
         .maxOrNull()?.coerceAtLeast(1) ?: 1
@@ -176,9 +201,85 @@ private fun DayRow(day: DayBar) {
         Icon(
             if (day.goalMet == true) Icons.Filled.CheckCircle else Icons.Filled.Info,
             contentDescription = null,
-            tint = if (day.goalMet == false) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary,
+            tint = if (day.goalMet == false) ZoneColors.Exceeded else ZoneColors.Safe,
         )
         Text(date, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
         Text("$value · $status", style = MaterialTheme.typography.bodyMedium)
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun HistoryViewToggle(showCategories: Boolean, onChange: (Boolean) -> Unit) {
+    SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
+        SegmentedButton(
+            selected = !showCategories,
+            onClick = { onChange(false) },
+            shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2),
+        ) { Text(stringResource(R.string.history_view_days)) }
+        SegmentedButton(
+            selected = showCategories,
+            onClick = { onChange(true) },
+            shape = SegmentedButtonDefaults.itemShape(index = 1, count = 2),
+        ) { Text(stringResource(R.string.history_view_categories)) }
+    }
+}
+
+@StringRes
+private fun categoryName(c: AppCategory): Int = when (c) {
+    AppCategory.SOCIAL -> R.string.cat_social
+    AppCategory.ENTERTAINMENT -> R.string.cat_entertainment
+    AppCategory.WORK_LEARNING -> R.string.cat_work
+    AppCategory.NEWS -> R.string.cat_news
+    AppCategory.OTHER -> R.string.cat_other
+}
+
+private fun categoryColor(c: AppCategory): Color = when (c) {
+    AppCategory.SOCIAL -> Color(0xFF8B5CF6)
+    AppCategory.ENTERTAINMENT -> Color(0xFFEC4899)
+    AppCategory.WORK_LEARNING -> Color(0xFF3B82F6)
+    AppCategory.NEWS -> Color(0xFF14B8A6)
+    AppCategory.OTHER -> Color(0xFF94A3B8)
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun CategoriesSection(snapshot: com.scrollmate.app.data.UsageSnapshot) {
+    var week by rememberSaveable { mutableStateOf(false) }
+    val perApp = if (week) snapshot.weekPerApp else snapshot.today?.perApp?.toMap().orEmpty()
+    val shares = CategoryClassifier.breakdown(perApp, snapshot.categoryHints)
+
+    SectionCard(stringResource(R.string.categories_title)) {
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            FilterChip(selected = !week, onClick = { week = false }, label = { Text(stringResource(R.string.categories_today)) }, modifier = Modifier.heightIn(min = 48.dp))
+            FilterChip(selected = week, onClick = { week = true }, label = { Text(stringResource(R.string.categories_week)) }, modifier = Modifier.heightIn(min = 48.dp))
+        }
+        if (shares.isEmpty()) {
+            Text(stringResource(R.string.categories_empty), style = MaterialTheme.typography.bodyMedium)
+        }
+        shares.forEach { share ->
+            val name = stringResource(categoryName(share.category))
+            val time = durationText(share.duration)
+            val apps = share.packages.take(3).joinToString(", ") { snapshot.labels[it] ?: it }
+            Column(
+                Modifier.fillMaxWidth().semantics(mergeDescendants = true) {
+                    contentDescription = "$name: $time, ${share.percent} %"
+                },
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                Row(Modifier.fillMaxWidth()) {
+                    Text(name, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
+                    Text(stringResource(R.string.categories_row, time, share.percent), style = MaterialTheme.typography.bodyLarge)
+                }
+                LinearProgressIndicator(
+                    progress = { share.fraction.toFloat() },
+                    color = categoryColor(share.category),
+                    modifier = Modifier.fillMaxWidth().height(8.dp),
+                )
+                Text(stringResource(R.string.categories_apps, apps), style = MaterialTheme.typography.bodySmall)
+            }
+        }
+        Text(stringResource(R.string.categories_note), style = MaterialTheme.typography.bodySmall)
     }
 }

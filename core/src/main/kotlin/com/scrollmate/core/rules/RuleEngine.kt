@@ -7,6 +7,7 @@ import com.scrollmate.core.model.NotificationRecord
 import com.scrollmate.core.model.RuleId
 import com.scrollmate.core.model.UserPreferences
 import com.scrollmate.core.progress.ProgressCalculator
+import com.scrollmate.core.winddown.WindDown
 import java.time.Duration
 import java.time.ZonedDateTime
 
@@ -23,9 +24,11 @@ data class CoachingRule(
 
         val ALL: List<CoachingRule> = listOf(
             CoachingRule(RuleId.STRICT_REPEAT, setOf(CoachingStyle.STRICT), priority = 0, countsTowardsLimit = true),
-            CoachingRule(RuleId.THRESHOLD_TOTAL, REMINDER_STYLES, priority = 1, countsTowardsLimit = true),
-            CoachingRule(RuleId.THRESHOLD_APP, REMINDER_STYLES, priority = 2, countsTowardsLimit = true),
-            CoachingRule(RuleId.CHECK_IN, CoachingStyle.values().toSet(), priority = 3, countsTowardsLimit = false),
+            // The evening reminder was configured explicitly, so it applies in every style.
+            CoachingRule(RuleId.WIND_DOWN, CoachingStyle.values().toSet(), priority = 1, countsTowardsLimit = false),
+            CoachingRule(RuleId.THRESHOLD_TOTAL, REMINDER_STYLES, priority = 2, countsTowardsLimit = true),
+            CoachingRule(RuleId.THRESHOLD_APP, REMINDER_STYLES, priority = 3, countsTowardsLimit = true),
+            CoachingRule(RuleId.CHECK_IN, CoachingStyle.values().toSet(), priority = 4, countsTowardsLimit = false),
         )
 
         fun of(id: RuleId): CoachingRule = ALL.first { it.id == id }
@@ -145,6 +148,15 @@ class RuleEngine(private val coach: Coach) {
             if (key !in sentKeys) {
                 candidates += CoachTrigger(RuleId.CHECK_IN, null, key, coach.checkIn(progress), false)
             }
+        }
+
+        // Evening wind-down reminder: once per evening, during the lead phase before bedtime.
+        val wd = prefs.windDown
+        if (enabled(RuleId.WIND_DOWN) && WindDown.isLeadPhase(ctx.now.toLocalDateTime(), wd) &&
+            wd.pausedForDate != WindDown.eveningOf(ctx.now.toLocalDateTime(), wd)
+        ) {
+            val key = NotificationKeys.key(today, RuleId.WIND_DOWN)
+            if (key !in sentKeys) candidates += CoachTrigger(RuleId.WIND_DOWN, null, key, coach.windDown(), false)
         }
 
         val send = candidates

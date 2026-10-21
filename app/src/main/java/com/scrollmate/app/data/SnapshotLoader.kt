@@ -1,5 +1,6 @@
 package com.scrollmate.app.data
 
+import com.scrollmate.core.categories.SystemCategoryHint
 import com.scrollmate.core.datasource.DataSourceResolver
 import com.scrollmate.core.history.HistoryCalculator
 import com.scrollmate.core.history.HistorySummary
@@ -30,6 +31,9 @@ data class UsageSnapshot(
     val appUsageToday: Map<String, Duration>,
     val history: HistorySummary?,
     val labels: Map<String, String>,
+    /** Watched apps summed over the last 7 days, for the category analysis. */
+    val weekPerApp: Map<String, Duration> = emptyMap(),
+    val categoryHints: Map<String, SystemCategoryHint> = emptyMap(),
 ) {
     val date: LocalDate get() = now.toLocalDate()
     val isDemo: Boolean get() = state == DataSourceState.DEMO
@@ -73,9 +77,14 @@ class SnapshotLoader(
         val appUsage = entries.filter { it.date == date }
             .groupBy { it.packageName }
             .mapValues { (_, l) -> l.fold(Duration.ZERO) { acc, e -> acc.plus(e.duration) } }
-        val labels = (today.perApp.map { it.first } + p.goal.appLimits.map { it.packageName })
+        val weekPerApp = entries
+            .filter { it.source == source && DailyUsage.isWatched(it.packageName, watched, excluded) }
+            .groupBy { it.packageName }
+            .mapValues { (_, l) -> l.fold(Duration.ZERO) { acc, e -> acc.plus(e.duration) } }
+        val labels = (today.perApp.map { it.first } + p.goal.appLimits.map { it.packageName } + weekPerApp.keys)
             .distinct()
             .associateWith { installedApps.label(it) }
+        val hints = if (source == UsageSource.LIVE) weekPerApp.keys.associateWith { installedApps.categoryHint(it) } else emptyMap()
 
         UsageSnapshot(
             state = state,
@@ -86,6 +95,8 @@ class SnapshotLoader(
             appUsageToday = appUsage,
             history = history,
             labels = labels,
+            weekPerApp = weekPerApp,
+            categoryHints = hints,
         )
     }
 }

@@ -12,7 +12,10 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStoreFile
+import com.scrollmate.core.model.CoachVoice
 import com.scrollmate.core.model.CoachingStyle
+import com.scrollmate.core.model.ThemeMode
+import com.scrollmate.core.model.WindDownSettings
 import com.scrollmate.core.model.DailyGoal
 import com.scrollmate.core.model.ReminderSettings
 import com.scrollmate.core.model.UserPreferences
@@ -23,6 +26,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.io.IOException
 import java.time.Duration
+import java.time.LocalDate
 import java.time.LocalTime
 
 /** User preferences in Jetpack DataStore. All writes go through [UserPreferences.sanitized]. */
@@ -73,6 +77,16 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
             focusDuration = p[K.FOCUS_MIN]?.let { Duration.ofMinutes(it) } ?: defaults.focusDuration,
             demoMode = p[K.DEMO_MODE] ?: false,
             selectedApps = PreferencesCodec.decodeStringSet(p[K.SELECTED_APPS]),
+            voice = p[K.VOICE]?.let { n -> CoachVoice.values().firstOrNull { it.name == n } } ?: defaults.voice,
+            themeMode = p[K.THEME]?.let { n -> ThemeMode.values().firstOrNull { it.name == n } } ?: defaults.themeMode,
+            windDown = WindDownSettings(
+                enabled = p[K.WD_ENABLED] ?: false,
+                bedtime = p[K.WD_BEDTIME]?.let { minuteOfDay(it) } ?: defaults.windDown.bedtime,
+                wakeTime = p[K.WD_WAKE]?.let { minuteOfDay(it) } ?: defaults.windDown.wakeTime,
+                leadMinutes = p[K.WD_LEAD] ?: defaults.windDown.leadMinutes,
+                blockedApps = PreferencesCodec.decodeStringSet(p[K.WD_BLOCKED]),
+                pausedForDate = p[K.WD_PAUSED]?.let { runCatching { LocalDate.parse(it) }.getOrNull() },
+            ),
         ).sanitized()
     }
 
@@ -91,7 +105,17 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
         p[K.FOCUS_MIN] = v.focusDuration.toMinutes()
         p[K.DEMO_MODE] = v.demoMode
         p[K.SELECTED_APPS] = PreferencesCodec.encodeStringSet(v.selectedApps)
+        p[K.VOICE] = v.voice.name
+        p[K.THEME] = v.themeMode.name
+        p[K.WD_ENABLED] = v.windDown.enabled
+        p[K.WD_BEDTIME] = v.windDown.bedtime.hour * 60 + v.windDown.bedtime.minute
+        p[K.WD_WAKE] = v.windDown.wakeTime.hour * 60 + v.windDown.wakeTime.minute
+        p[K.WD_LEAD] = v.windDown.leadMinutes
+        p[K.WD_BLOCKED] = PreferencesCodec.encodeStringSet(v.windDown.blockedApps)
+        p[K.WD_PAUSED] = v.windDown.pausedForDate?.toString() ?: ""
     }
+
+    private fun minuteOfDay(m: Int): LocalTime = LocalTime.of((m / 60).coerceIn(0, 23), (m % 60).coerceIn(0, 59))
 
     private object K {
         val ONBOARDING_DONE = booleanPreferencesKey("onboarding_completed")
@@ -108,6 +132,14 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
         val FOCUS_MIN = longPreferencesKey("focus_min")
         val DEMO_MODE = booleanPreferencesKey("demo_mode")
         val SELECTED_APPS = stringPreferencesKey("selected_apps")
+        val VOICE = stringPreferencesKey("coach_voice")
+        val THEME = stringPreferencesKey("theme_mode")
+        val WD_ENABLED = booleanPreferencesKey("wind_down_enabled")
+        val WD_BEDTIME = intPreferencesKey("wind_down_bedtime_min")
+        val WD_WAKE = intPreferencesKey("wind_down_wake_min")
+        val WD_LEAD = intPreferencesKey("wind_down_lead_min")
+        val WD_BLOCKED = stringPreferencesKey("wind_down_blocked")
+        val WD_PAUSED = stringPreferencesKey("wind_down_paused_for")
     }
 
     companion object {

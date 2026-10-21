@@ -2,7 +2,9 @@ package com.scrollmate.app.data
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
+import com.scrollmate.core.categories.SystemCategoryHint
 import com.scrollmate.core.demo.DemoData
 
 data class LauncherApp(val packageName: String, val label: String)
@@ -40,6 +42,28 @@ class InstalledApps(private val context: Context) {
             } catch (e: PackageManager.NameNotFoundException) {
                 packageName
             }
+        }
+    }
+
+    private val hintCache = HashMap<String, SystemCategoryHint>()
+
+    /** The category an app declares for itself (Android 8+), used for the category analysis. */
+    fun categoryHint(packageName: String): SystemCategoryHint = hintCache.getOrPut(packageName) {
+        val category = try {
+            pm.getApplicationInfo(packageName, 0).category
+        } catch (e: PackageManager.NameNotFoundException) {
+            ApplicationInfo.CATEGORY_UNDEFINED
+        }
+        when (category) {
+            ApplicationInfo.CATEGORY_SOCIAL -> SystemCategoryHint.SOCIAL
+            ApplicationInfo.CATEGORY_VIDEO -> SystemCategoryHint.VIDEO
+            ApplicationInfo.CATEGORY_AUDIO -> SystemCategoryHint.AUDIO
+            ApplicationInfo.CATEGORY_GAME -> SystemCategoryHint.GAME
+            ApplicationInfo.CATEGORY_IMAGE -> SystemCategoryHint.IMAGE
+            ApplicationInfo.CATEGORY_NEWS -> SystemCategoryHint.NEWS
+            ApplicationInfo.CATEGORY_PRODUCTIVITY -> SystemCategoryHint.PRODUCTIVITY
+            ApplicationInfo.CATEGORY_MAPS -> SystemCategoryHint.MAPS
+            else -> SystemCategoryHint.NONE
         }
     }
 

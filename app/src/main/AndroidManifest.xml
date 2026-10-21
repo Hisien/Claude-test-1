@@ -10,6 +10,12 @@
     <!-- Runtime permission on Android 13+. Without it, coach messages are shown in-app only. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <!-- Evening wind-down: calming overlay above apps the user selected ("Über anderen Apps einblenden"). -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
     <!-- All data stays on the device: make sure no library merges the INTERNET permission in. -->
     <uses-permission
         android:name="android.permission.INTERNET"
@@ -47,5 +53,23 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".winddown.WindDownService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Evening wind-down chosen by the user: covers user-selected apps with a calming breathing screen during the user's bedtime window." />
+        </service>
+
+        <receiver
+            android:name=".winddown.BootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>

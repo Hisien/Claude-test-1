@@ -8,7 +8,7 @@ import com.scrollmate.core.progress.Progress
 import java.time.Instant
 
 /** The one optional next step a coach message offers. NONE is only used for plain acknowledgements. */
-enum class CoachAction { START_FOCUS, TAKE_BREAK, ANSWER_CHECK_IN, REFLECT, NONE }
+enum class CoachAction { START_FOCUS, TAKE_BREAK, ANSWER_CHECK_IN, REFLECT, TRY_ALTERNATIVE, NONE }
 
 /**
  * Message kinds. The :app module maps each kind to a German string in strings.xml, so the
@@ -32,6 +32,14 @@ enum class MessageKind {
     CHECK_IN_REPLY_AUTOPILOT,
     FOCUS_COMPLETED,
     FOCUS_ENDED_EARLY,
+    WIND_DOWN,
+    MOOD_BETTER,
+    MOOD_SAME,
+    MOOD_TIRED,
+    INTENT_DISTRACTION,
+    INTENT_BOREDOM,
+    INTENT_INFORMATION,
+    INTENT_CONNECTION,
 }
 
 data class CoachMessage(
@@ -57,6 +65,9 @@ interface Coach {
     fun dailySummary(progress: Progress?, style: CoachingStyle, focusMinutes: Int): CoachMessage
     fun checkInReply(answer: CheckInAnswer, focusMinutes: Int): CoachMessage
     fun focusFinished(session: FocusSession, now: Instant): CoachMessage
+    fun windDown(): CoachMessage
+    fun moodReply(mood: MoodAfterScroll): CoachMessage
+    fun intentReply(intent: ScrollIntent): CoachMessage
 }
 
 class RuleBasedCoach : Coach {
@@ -108,6 +119,21 @@ class RuleBasedCoach : Coach {
         val minutes = FocusSessions.elapsed(session, now).toMinutes().toInt()
         val kind = if (session.status == FocusStatus.ENDED_EARLY) MessageKind.FOCUS_ENDED_EARLY else MessageKind.FOCUS_COMPLETED
         return CoachMessage(kind, CoachAction.REFLECT, minutes = minutes)
+    }
+
+    override fun windDown(): CoachMessage = CoachMessage(MessageKind.WIND_DOWN, CoachAction.TRY_ALTERNATIVE)
+
+    override fun moodReply(mood: MoodAfterScroll): CoachMessage = when (mood) {
+        MoodAfterScroll.BETTER -> CoachMessage(MessageKind.MOOD_BETTER, CoachAction.NONE)
+        MoodAfterScroll.SAME -> CoachMessage(MessageKind.MOOD_SAME, CoachAction.TRY_ALTERNATIVE)
+        MoodAfterScroll.TIRED -> CoachMessage(MessageKind.MOOD_TIRED, CoachAction.TRY_ALTERNATIVE)
+    }
+
+    override fun intentReply(intent: ScrollIntent): CoachMessage = when (intent) {
+        ScrollIntent.DISTRACTION -> CoachMessage(MessageKind.INTENT_DISTRACTION, CoachAction.TRY_ALTERNATIVE)
+        ScrollIntent.BOREDOM -> CoachMessage(MessageKind.INTENT_BOREDOM, CoachAction.TRY_ALTERNATIVE)
+        ScrollIntent.INFORMATION -> CoachMessage(MessageKind.INTENT_INFORMATION, CoachAction.NONE)
+        ScrollIntent.CONNECTION -> CoachMessage(MessageKind.INTENT_CONNECTION, CoachAction.NONE)
     }
 
     companion object {

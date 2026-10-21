@@ -1,6 +1,11 @@
 package com.scrollmate.app.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,7 +32,10 @@ import com.scrollmate.app.ui.components.EmptyState
 import com.scrollmate.app.ui.components.ErrorState
 import com.scrollmate.app.ui.components.LoadingState
 import com.scrollmate.app.ui.components.PermissionCard
+import com.scrollmate.app.ui.components.GlowCard
 import com.scrollmate.app.ui.components.ProgressRing
+import com.scrollmate.app.ui.theme.ZoneColors
+import com.scrollmate.core.progress.LimitZone
 import com.scrollmate.app.ui.components.ScreenColumn
 import com.scrollmate.app.ui.components.SectionCard
 import com.scrollmate.app.ui.components.durationText
@@ -74,11 +82,31 @@ private fun ProgressSection(snapshot: UsageSnapshot) {
     val used = durationText(progress.used)
     val limit = durationText(progress.limit)
     val ringDescription = stringResource(R.string.cd_progress_ring, used, limit, progress.percent)
-    SectionCard(null) {
+    val glow = ZoneColors.of(progress.zone)
+    val zoneLabel = stringResource(
+        when (progress.zone) {
+            LimitZone.SAFE -> R.string.zone_safe
+            LimitZone.WARNING -> R.string.zone_warning
+            LimitZone.EXCEEDED -> R.string.zone_exceeded
+        },
+    )
+    GlowCard(glow) {
+        // Text label next to the colour, so the status never depends on colour alone.
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.semantics(mergeDescendants = true) { },
+        ) {
+            Box(Modifier.size(12.dp).clip(CircleShape).background(glow))
+            Text(
+                zoneLabel,
+                style = MaterialTheme.typography.labelLarge,
+                modifier = Modifier.padding(start = 8.dp),
+            )
+        }
         Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             ProgressRing(
                 fraction = progress.ringFraction,
-                overLimit = progress.isOverLimit,
+                color = glow,
                 modifier = Modifier.semantics(mergeDescendants = true) { contentDescription = ringDescription },
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -99,7 +127,6 @@ private fun ProgressSection(snapshot: UsageSnapshot) {
         Text(
             remainingText,
             style = MaterialTheme.typography.titleMedium,
-            color = if (progress.isOverLimit) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth(),
         )

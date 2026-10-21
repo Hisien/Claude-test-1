@@ -19,6 +19,24 @@ data class Progress(
 
     /** Fraction for drawing a ring, capped at 1.0. */
     val ringFraction: Float get() = fraction.coerceIn(0.0, 1.0).toFloat()
+
+    val zone: LimitZone get() = LimitZone.of(percent)
+}
+
+/** Visual warning level: < 70 % safe, 70–99 % warning, from 100 % exceeded. */
+enum class LimitZone {
+    SAFE, WARNING, EXCEEDED;
+
+    companion object {
+        const val WARNING_FROM = 70
+        const val EXCEEDED_FROM = 100
+
+        fun of(percent: Int): LimitZone = when {
+            percent >= EXCEEDED_FROM -> EXCEEDED
+            percent >= WARNING_FROM -> WARNING
+            else -> SAFE
+        }
+    }
 }
 
 object ProgressCalculator {

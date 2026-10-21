@@ -47,6 +47,7 @@ import com.scrollmate.app.ui.screens.HistoryScreen
 import com.scrollmate.app.ui.screens.OnboardingScreen
 import com.scrollmate.app.ui.screens.SettingsScreen
 import com.scrollmate.app.ui.screens.TodayScreen
+import com.scrollmate.core.model.CoachVoice
 import kotlinx.coroutines.delay
 
 enum class Tab(@StringRes val label: Int, val icon: ImageVector) {
@@ -62,6 +63,7 @@ class SystemActions(
     val openUsageAccess: () -> Unit,
     val requestNotifications: () -> Unit,
     val openNotificationSettings: () -> Unit,
+    val openOverlaySettings: () -> Unit,
 )
 
 @Composable
@@ -102,6 +104,7 @@ fun ScrollMateRoot(
                     .putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName),
             )
         },
+        openOverlaySettings = { context.startSafely(mainViewModel.overlaySettingsIntent()) },
     )
 
     val prefs = state.prefs
@@ -134,7 +137,10 @@ private fun MainScaffold(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(tab.label)) },
+                title = {
+                    val avatar = state.prefs?.voice?.avatar.orEmpty()
+                    Text("$avatar ${stringResource(tab.label)}".trim())
+                },
                 actions = {
                     state.snapshot?.let { StatusChip(it.state, Modifier.padding(end = 12.dp)) }
                 },
@@ -177,6 +183,7 @@ private fun MainScaffold(
                 defaultMinutes = (state.prefs?.focusDuration?.toMinutes() ?: 10L).toInt(),
                 restrictionStatus = mainViewModel.restrictionStatus,
                 modifier = modifier,
+                voice = state.prefs?.voice ?: CoachVoice.MOUSE,
             )
             Tab.HISTORY -> HistoryScreen(
                 state = state,

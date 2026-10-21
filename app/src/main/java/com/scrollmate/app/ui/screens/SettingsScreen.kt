@@ -57,7 +57,12 @@ import com.scrollmate.app.ui.components.SectionCard
 import com.scrollmate.app.ui.components.Stepper
 import com.scrollmate.app.ui.components.durationText
 import com.scrollmate.app.ui.components.hhmm
+import com.scrollmate.app.ui.CoachTexts
 import com.scrollmate.core.model.AppLimit
+import com.scrollmate.core.model.CoachVoice
+import com.scrollmate.core.model.ThemeMode
+import com.scrollmate.core.winddown.WindDown
+import java.time.LocalDateTime
 import com.scrollmate.core.model.CoachingStyle
 import com.scrollmate.core.model.DataSourceState
 import com.scrollmate.core.model.RuleId
@@ -88,9 +93,12 @@ fun SettingsScreen(
         SectionCard(stringResource(R.string.settings_style_title)) {
             CoachingStyleOptions(selected = prefs.style, onSelect = { s -> update { it.copy(style = s) } })
         }
+        VoiceSection(prefs, update)
         RulesSection(prefs, update)
+        WindDownSection(state, prefs, viewModel, actions, update)
         TimeWindowsSection(prefs, update)
         AppSelectionSection(state, prefs, viewModel, update)
+        ThemeSection(prefs, update)
         DataManagementSection(viewModel)
         SectionCard(stringResource(R.string.settings_about_title)) {
             InfoRow(Icons.Filled.Info, stringResource(R.string.settings_about_body))
@@ -519,4 +527,169 @@ fun TimeDialog(title: String, initial: LocalTime, onDismiss: () -> Unit, onConfi
         },
         dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) } },
     )
+}
+
+
+@Composable
+private fun VoiceSection(prefs: UserPreferences, update: ((UserPreferences) -> UserPreferences) -> Unit) {
+    val res = LocalContext.current.resources
+    SectionCard(stringResource(R.string.settings_voice_title)) {
+        Text(stringResource(R.string.settings_voice_desc), style = MaterialTheme.typography.bodySmall)
+        CoachVoice.entries.forEach { voice ->
+            val selected = prefs.voice == voice
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 48.dp)
+                    .selectable(selected = selected, onClick = { update { it.copy(voice = voice) } }, role = Role.RadioButton)
+                    .padding(vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                RadioButton(selected = selected, onClick = null)
+                Column(Modifier.padding(start = 12.dp)) {
+                    Text(stringResource(CoachTexts.voiceName(voice)), style = MaterialTheme.typography.bodyLarge)
+                    Text(stringResource(CoachTexts.voiceDescription(voice)), style = MaterialTheme.typography.bodySmall)
+                    if (selected) {
+                        Text(
+                            stringResource(R.string.settings_voice_example, CoachTexts.voiceExample(res, voice)),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ThemeSection(prefs: UserPreferences, update: ((UserPreferences) -> UserPreferences) -> Unit) {
+    SectionCard(stringResource(R.string.settings_theme_title)) {
+        ThemeMode.entries.forEach { mode ->
+            val label = when (mode) {
+                ThemeMode.SYSTEM -> stringResource(R.string.theme_system)
+                ThemeMode.LIGHT -> stringResource(R.string.theme_light)
+                ThemeMode.DARK -> stringResource(R.string.theme_dark)
+            }
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 48.dp)
+                    .selectable(selected = prefs.themeMode == mode, onClick = { update { it.copy(themeMode = mode) } }, role = Role.RadioButton),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                RadioButton(selected = prefs.themeMode == mode, onClick = null)
+                Text(label, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(start = 12.dp))
+            }
+        }
+    }
+}
+
+@Composable
+private fun WindDownSection(
+    state: MainUiState,
+    prefs: UserPreferences,
+    viewModel: MainViewModel,
+    actions: SystemActions,
+    update: ((UserPreferences) -> UserPreferences) -> Unit,
+) {
+    val wd = prefs.windDown
+    var pick by remember { mutableStateOf<Boolean?>(null) } // true = bedtime, false = wake time
+    var showApps by rememberSaveable { mutableStateOf(false) }
+    val usageOk = viewModel.isUsageAccessGranted()
+
+    SectionCard(stringResource(R.string.settings_wind_down_title)) {
+        Text(stringResource(R.string.settings_wind_down_desc, wd.leadMinutes), style = MaterialTheme.typography.bodySmall)
+        SwitchRow(stringResource(R.string.settings_wind_down_switch), null, wd.enabled) { viewModel.enableWindDown(it) }
+        if (wd.enabled) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedButton(onClick = { pick = true }) { Text(stringResource(R.string.settings_bedtime, wd.bedtime.hhmm())) }
+                OutlinedButton(onClick = { pick = false }) { Text(stringResource(R.string.settings_wake_time, wd.wakeTime.hhmm())) }
+            }
+            Stepper(
+                label = stringResource(R.string.settings_wind_down_lead),
+                value = stringResource(R.string.duration_min, wd.leadMinutes),
+                onMinus = { update { it.copy(windDown = it.windDown.copy(leadMinutes = (it.windDown.leadMinutes - 15).coerceAtLeast(0))) } },
+                onPlus = { update { it.copy(windDown = it.windDown.copy(leadMinutes = (it.windDown.leadMinutes + 15).coerceAtMost(120))) } },
+                minusEnabled = wd.leadMinutes > 0,
+                plusEnabled = wd.leadMinutes < 120,
+            )
+            Text(
+                stringResource(R.string.settings_wind_down_window, WindDown.start(wd).hhmm(), wd.wakeTime.hhmm()),
+                style = MaterialTheme.typography.bodyMedium,
+            )
+
+            HorizontalDivider()
+            if (state.overlayAllowed) {
+                InfoRow(Icons.Filled.Info, stringResource(R.string.settings_overlay_ok))
+            } else {
+                Text(stringResource(R.string.settings_overlay_missing), style = MaterialTheme.typography.bodyMedium)
+                Button(onClick = actions.openOverlaySettings, modifier = Modifier.fillMaxWidth()) {
+                    Text(stringResource(R.string.action_allow_overlay))
+                }
+            }
+            if (!usageOk) Text(stringResource(R.string.settings_wind_down_needs_usage), style = MaterialTheme.typography.bodyMedium)
+            if (state.overlayAllowed && usageOk && wd.blockedApps.isNotEmpty()) {
+                Text(stringResource(R.string.settings_wind_down_ready), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
+            }
+            if (wd.pausedForDate != null && wd.pausedForDate == WindDown.eveningOf(LocalDateTime.now(), wd)) {
+                Text(stringResource(R.string.settings_wind_down_paused), style = MaterialTheme.typography.bodyMedium)
+                TextButton(onClick = { update { it.copy(windDown = it.windDown.copy(pausedForDate = null)) } }) {
+                    Text(stringResource(R.string.action_resume_tonight))
+                }
+            }
+
+            HorizontalDivider()
+            Text(stringResource(R.string.settings_wind_down_apps), style = MaterialTheme.typography.bodyLarge)
+            Text(
+                if (wd.blockedApps.isEmpty()) stringResource(R.string.settings_wind_down_apps_none)
+                else stringResource(R.string.settings_wind_down_apps_count, wd.blockedApps.size),
+                style = MaterialTheme.typography.bodyMedium,
+            )
+            OutlinedButton(onClick = {
+                showApps = !showApps
+                if (showApps) viewModel.loadInstalledApps()
+            }) {
+                Text(if (showApps) stringResource(R.string.action_collapse) else stringResource(R.string.action_choose_apps))
+            }
+            if (showApps) {
+                val apps = state.installedApps
+                if (apps == null) {
+                    Text(stringResource(R.string.state_loading), style = MaterialTheme.typography.bodyMedium)
+                } else {
+                    apps.forEach { app ->
+                        val checked = app.packageName in wd.blockedApps
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .heightIn(min = 48.dp)
+                                .toggleable(value = checked, role = Role.Checkbox, onValueChange = { on ->
+                                    update {
+                                        val set = if (on) it.windDown.blockedApps + app.packageName else it.windDown.blockedApps - app.packageName
+                                        it.copy(windDown = it.windDown.copy(blockedApps = set))
+                                    }
+                                }),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Checkbox(checked = checked, onCheckedChange = null)
+                            Text(app.label, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(start = 12.dp))
+                        }
+                    }
+                }
+            }
+            Text(stringResource(R.string.settings_wind_down_note), style = MaterialTheme.typography.bodySmall)
+        }
+    }
+
+    pick?.let { bedtime ->
+        TimeDialog(
+            title = if (bedtime) stringResource(R.string.settings_bedtime, wd.bedtime.hhmm()) else stringResource(R.string.settings_wake_time, wd.wakeTime.hhmm()),
+            initial = if (bedtime) wd.bedtime else wd.wakeTime,
+            onDismiss = { pick = null },
+            onConfirm = { t ->
+                pick = null
+                update { if (bedtime) it.copy(windDown = it.windDown.copy(bedtime = t)) else it.copy(windDown = it.windDown.copy(wakeTime = t)) }
+            },
+        )
+    }
 }

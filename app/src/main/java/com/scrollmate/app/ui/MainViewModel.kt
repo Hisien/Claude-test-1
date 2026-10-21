@@ -12,7 +12,11 @@ import com.scrollmate.app.data.UsageSnapshot
 import com.scrollmate.app.data.db.ReflectionEntity
 import com.scrollmate.app.data.message
 import com.scrollmate.app.domain.CoachEvaluator
+import com.scrollmate.app.winddown.WindDownController
 import com.scrollmate.app.work.WorkScheduler
+import com.scrollmate.core.coach.MoodAfterScroll
+import com.scrollmate.core.coach.ScrollIntent
+import com.scrollmate.core.winddown.WindDown
 import com.scrollmate.core.coach.CheckInAnswer
 import com.scrollmate.core.coach.CoachMessage
 import com.scrollmate.core.model.CoachingStyle
@@ -50,6 +54,8 @@ data class MainUiState(
     val manualCheck: ManualCheckResult? = null,
     val installedApps: List<LauncherApp>? = null,
     val reflectionSaved: Boolean = false,
+    val overlayAllowed: Boolean = false,
+    val followUpReply: CoachMessage? = null,
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -83,14 +89,42 @@ class MainViewModel(private val c: AppContainer) : ViewModel() {
             c.settings.preferences.collect { p ->
                 _state.update { it.copy(prefs = p) }
                 reload(p)
+                WindDownController.sync(c.appContext, p)
             }
         }
     }
 
     /** Called on every resume (and once a minute while visible): re-checks permissions and data. */
     fun refresh() {
-        reload(_state.value.prefs ?: return)
+        val prefs = _state.value.prefs ?: return
+        reload(prefs)
+        // Permissions may have changed in system settings: start or stop the wind-down accordingly.
+        WindDownController.sync(c.appContext, prefs)
+        _state.update { it.copy(overlayAllowed = WindDownController.canDrawOverlays(c.appContext)) }
     }
+
+    fun overlaySettingsIntent(): Intent = WindDownController.overlaySettingsIntent(c.appContext)
+
+    /** Turns the wind-down on and pre-selects well-known feed apps that are installed, if none are chosen yet. */
+    fun enableWindDown(enabled: Boolean) {
+        viewModelScope.launch {
+            val installed = if (enabled) withContext(Dispatchers.IO) { c.installedApps.launcherApps().map { it.packageName }.toSet() } else emptySet()
+            c.settings.update { p ->
+                val blocked = if (enabled && p.windDown.blockedApps.isEmpty()) {
+                    WindDown.SUGGESTED_PACKAGES.filter { it in installed }.toSet()
+                } else {
+                    p.windDown.blockedApps
+                }
+                p.copy(windDown = p.windDown.copy(enabled = enabled, blockedApps = blocked))
+            }
+        }
+    }
+
+    fun answerMood(mood: MoodAfterScroll) = _state.update { it.copy(followUpReply = c.coach.moodReply(mood)) }
+
+    fun answerIntent(intent: ScrollIntent) = _state.update { it.copy(followUpReply = c.coach.intentReply(intent)) }
+
+    fun clearFollowUp() = _state.update { it.copy(followUpReply = null) }
 
     private fun reload(prefs: UserPreferences) {
         loadJob?.cancel()

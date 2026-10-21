@@ -26,13 +26,20 @@ jobs:
         run: chmod +x gradlew
 
       - name: Logic tests (:core)
-        run: ./gradlew :core:test --stacktrace
+        run: set -o pipefail; ./gradlew :core:test 2>&1 | tee -a build.log
 
       - name: Settings persistence test (:app)
-        run: ./gradlew :app:testDebugUnitTest --stacktrace
+        run: set -o pipefail; ./gradlew :app:testDebugUnitTest 2>&1 | tee -a build.log
 
       - name: Build debug APK
-        run: ./gradlew assembleDebug --stacktrace
+        run: set -o pipefail; ./gradlew assembleDebug 2>&1 | tee -a build.log
+
+      - name: Report errors as annotations
+        if: failure()
+        run: |
+          grep -E "^e: |error:|FAILED|What went wrong|> .*failed|Exception|Expected|but was" build.log | head -60 > errors.txt || true
+          msg=$(sed ':a;N;$!ba;s/%/%25/g;s/\r/%0D/g;s/\n/%0A/g' errors.txt)
+          echo "::error title=Build errors::${msg}"
 
       - name: Upload APK
         uses: actions/upload-artifact@v4

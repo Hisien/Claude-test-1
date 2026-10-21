@@ -20,6 +20,43 @@ enum class CoachingStyle {
     FOCUS_WINDOWS,
 }
 
+/**
+ * How the coach sounds (independent of [CoachingStyle], which decides *when* it speaks).
+ * Each voice has its own avatar that is shown in the app and in notification titles.
+ */
+enum class CoachVoice(val avatar: String) {
+    /** Sweet, caring, playful; mix of short and longer messages. */
+    MOUSE("🐭"),
+
+    /** Confrontational, ultra short. */
+    HARSH("🔥"),
+
+    /** Casual and supportive, short. */
+    CASUAL("🕶️"),
+
+    /** Factual and neutral, short. */
+    NEUTRAL("🤖"),
+
+    /** Loud, all caps, short. */
+    AGGRESSIVE("💥"),
+}
+
+enum class ThemeMode { SYSTEM, LIGHT, DARK }
+
+/**
+ * Evening wind-down: from [leadMinutes] before [bedtime] until [wakeTime] the [blockedApps]
+ * are covered by a calming overlay (Android: overlay permission + usage access required).
+ */
+data class WindDownSettings(
+    val enabled: Boolean = false,
+    val bedtime: LocalTime = LocalTime.of(22, 30),
+    val wakeTime: LocalTime = LocalTime.of(6, 30),
+    val leadMinutes: Int = 30,
+    val blockedApps: Set<String> = emptySet(),
+    /** Local date for which the user paused the wind-down ("Heute Abend aussetzen"), if any. */
+    val pausedForDate: java.time.LocalDate? = null,
+)
+
 /** Where a usage number came from. */
 enum class UsageSource { LIVE, DEMO, MANUAL }
 
@@ -35,6 +72,7 @@ enum class RuleId {
     THRESHOLD_APP,
     STRICT_REPEAT,
     CHECK_IN,
+    WIND_DOWN,
 }
 
 data class AppUsageEntry(
@@ -107,6 +145,9 @@ data class UserPreferences(
     val demoMode: Boolean = false,
     /** Apps the user wants to watch. Empty means: all apps except ScrollMate and the launcher. */
     val selectedApps: Set<String> = emptySet(),
+    val voice: CoachVoice = CoachVoice.MOUSE,
+    val themeMode: ThemeMode = ThemeMode.SYSTEM,
+    val windDown: WindDownSettings = WindDownSettings(),
 ) {
     /** Returns a copy with all values clamped to sane ranges, so bad input can never break the rule engine. */
     fun sanitized(): UserPreferences = copy(
@@ -123,6 +164,7 @@ data class UserPreferences(
             strictRepeatInterval = reminders.strictRepeatInterval.coerceIn(Duration.ofMinutes(5), Duration.ofHours(4)),
         ),
         focusDuration = focusDuration.coerceIn(Duration.ofMinutes(1), Duration.ofHours(4)),
+        windDown = windDown.copy(leadMinutes = windDown.leadMinutes.coerceIn(0, 180)),
     )
 
     companion object {

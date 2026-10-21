@@ -43,6 +43,7 @@ import com.scrollmate.app.ui.components.SectionCard
 import com.scrollmate.app.ui.components.Stepper
 import com.scrollmate.app.ui.components.hhmm
 import com.scrollmate.core.focus.FocusSessions
+import com.scrollmate.core.model.CoachVoice
 import com.scrollmate.core.model.FocusSession
 import com.scrollmate.core.model.FocusStatus
 import com.scrollmate.core.model.RestrictionStatus
@@ -56,6 +57,7 @@ fun FocusScreen(
     defaultMinutes: Int,
     restrictionStatus: RestrictionStatus,
     modifier: Modifier = Modifier,
+    voice: CoachVoice = CoachVoice.MOUSE,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val recent by viewModel.recent.collectAsStateWithLifecycle()
@@ -80,6 +82,7 @@ fun FocusScreen(
         when {
             running != null -> RunningCard(running, state.remaining, onEnd = viewModel::endEarly)
             finished != null -> FinishedCard(
+                voice = voice,
                 finished = finished,
                 message = state.finishedMessage,
                 saved = state.reflectionSaved,
@@ -148,6 +151,7 @@ private fun RunningCard(session: FocusSession, remaining: Duration, onEnd: () ->
 
 @Composable
 private fun FinishedCard(
+    voice: CoachVoice,
     finished: FocusSession,
     message: com.scrollmate.core.coach.CoachMessage?,
     saved: Boolean,
@@ -155,7 +159,7 @@ private fun FinishedCard(
     onDone: () -> Unit,
 ) {
     var text by rememberSaveable(finished.id) { mutableStateOf(finished.reflection.orEmpty()) }
-    val rendered = message?.let { CoachTexts.render(LocalContext.current.resources, it) }
+    val rendered = message?.let { CoachTexts.render(LocalContext.current.resources, it, voice = voice) }
     SectionCard(rendered?.title ?: stringResource(R.string.coach_title_focus_done)) {
         rendered?.let { Text(it.body, style = MaterialTheme.typography.bodyLarge) }
         if (saved) {

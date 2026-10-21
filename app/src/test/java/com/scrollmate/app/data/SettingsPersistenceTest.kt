@@ -2,7 +2,10 @@ package com.scrollmate.app.data
 
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import com.scrollmate.core.model.AppLimit
+import com.scrollmate.core.model.CoachVoice
 import com.scrollmate.core.model.CoachingStyle
+import com.scrollmate.core.model.ThemeMode
+import com.scrollmate.core.model.WindDownSettings
 import com.scrollmate.core.model.RuleId
 import com.scrollmate.core.model.TimeWindow
 import com.scrollmate.core.model.UserPreferences
@@ -18,6 +21,7 @@ import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import java.io.File
 import java.time.Duration
+import java.time.LocalDate
 import java.time.LocalTime
 
 /**
@@ -54,6 +58,16 @@ class SettingsPersistenceTest {
             demoMode = true,
             focusDuration = Duration.ofMinutes(25),
             selectedApps = setOf("com.example.feed", "com.example.video"),
+            voice = CoachVoice.NEUTRAL,
+            themeMode = ThemeMode.DARK,
+            windDown = WindDownSettings(
+                enabled = true,
+                bedtime = LocalTime.of(23, 15),
+                wakeTime = LocalTime.of(7, 0),
+                leadMinutes = 45,
+                blockedApps = setOf("com.instagram.android"),
+                pausedForDate = LocalDate.of(2026, 10, 21),
+            ),
         ).let { p ->
             p.copy(
                 goal = p.goal.copy(

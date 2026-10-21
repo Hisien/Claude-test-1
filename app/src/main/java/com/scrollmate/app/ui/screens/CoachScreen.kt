@@ -20,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -33,7 +34,10 @@ import com.scrollmate.app.ui.CoachTexts
 import com.scrollmate.app.ui.MainUiState
 import com.scrollmate.app.ui.MainViewModel
 import com.scrollmate.app.ui.ManualCheckResult
+import com.scrollmate.app.ui.components.AlternativesCard
 import com.scrollmate.app.ui.components.DemoNotice
+import com.scrollmate.app.ui.components.SleepCoachCard
+import com.scrollmate.app.ui.components.durationText
 import com.scrollmate.app.ui.components.InfoRow
 import com.scrollmate.app.ui.components.LoadingState
 import com.scrollmate.app.ui.components.ScreenColumn
@@ -42,6 +46,11 @@ import com.scrollmate.app.ui.components.hhmm
 import com.scrollmate.core.coach.CheckInAnswer
 import com.scrollmate.core.coach.CoachAction
 import com.scrollmate.core.coach.CoachMessage
+import com.scrollmate.core.coach.HealthCoach
+import com.scrollmate.core.coach.MoodAfterScroll
+import com.scrollmate.core.coach.ScrollAlternative
+import com.scrollmate.core.coach.ScrollIntent
+import com.scrollmate.core.model.CoachVoice
 import java.time.ZoneId
 
 @Composable
@@ -61,13 +70,17 @@ fun CoachScreen(
     val reflections by viewModel.reflections.collectAsStateWithLifecycle()
     var reflecting by rememberSaveable { mutableStateOf(false) }
     var breakAcknowledged by rememberSaveable { mutableStateOf(false) }
+    var selectedAlternative by rememberSaveable { mutableStateOf<ScrollAlternative?>(null) }
     val focusMinutes = snapshot.prefs.focusDuration.toMinutes().toInt()
+    val voice = snapshot.prefs.voice
+    val suggested = HealthCoach.suggestAlternative(snapshot.now.toLocalDateTime())
 
     val onAction: (CoachAction) -> Unit = { action ->
         when (action) {
             CoachAction.START_FOCUS -> onStartFocus()
             CoachAction.REFLECT -> reflecting = true
             CoachAction.TAKE_BREAK -> breakAcknowledged = true
+            CoachAction.TRY_ALTERNATIVE -> selectedAlternative = suggested
             CoachAction.ANSWER_CHECK_IN, CoachAction.NONE -> Unit
         }
     }
@@ -75,9 +88,15 @@ fun CoachScreen(
     ScreenColumn(modifier) {
         if (snapshot.isDemo) DemoNotice()
 
+        // Avatar of the selected voice.
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Text(voice.avatar, style = MaterialTheme.typography.displaySmall)
+            Text(stringResource(CoachTexts.voiceName(voice)), style = MaterialTheme.typography.titleMedium)
+        }
+
         // 1. Daily summary from the rule-based coach.
         val summary = viewModel.coach.dailySummary(snapshot.progress, snapshot.prefs.style, focusMinutes)
-        CoachCard(summary, snapshot.labels, onAction)
+        CoachCard(summary, snapshot.labels, voice, onAction)
         if (breakAcknowledged) {
             Text(
                 stringResource(R.string.coach_break_ack),
@@ -99,12 +118,47 @@ fun CoachScreen(
             }
             state.checkInReply?.let { reply ->
                 HorizontalDivider()
-                MessageBody(reply, snapshot.labels, onAction = {
+                MessageBody(reply, snapshot.labels, voice, onAction = {
                     viewModel.clearCheckInReply()
                     onAction(it)
                 })
             }
         }
+
+        // 2b. Constructive follow-up questions.
+        SectionCard(stringResource(R.string.follow_up_title)) {
+            val used = snapshot.today?.total
+            Text(
+                if (used != null && !used.isZero) stringResource(R.string.follow_up_mood, durationText(used))
+                else stringResource(R.string.follow_up_mood_no_data),
+                style = MaterialTheme.typography.bodyLarge,
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                OutlinedButton(onClick = { viewModel.answerMood(MoodAfterScroll.BETTER) }, modifier = Modifier.weight(1f)) { Text(stringResource(R.string.mood_better)) }
+                OutlinedButton(onClick = { viewModel.answerMood(MoodAfterScroll.SAME) }, modifier = Modifier.weight(1f)) { Text(stringResource(R.string.mood_same)) }
+                OutlinedButton(onClick = { viewModel.answerMood(MoodAfterScroll.TIRED) }, modifier = Modifier.weight(1f)) { Text(stringResource(R.string.mood_tired)) }
+            }
+            Text(stringResource(R.string.follow_up_intent), style = MaterialTheme.typography.bodyLarge)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                OutlinedButton(onClick = { viewModel.answerIntent(ScrollIntent.DISTRACTION) }, modifier = Modifier.weight(1f)) { Text(stringResource(R.string.intent_distraction), maxLines = 1) }
+                OutlinedButton(onClick = { viewModel.answerIntent(ScrollIntent.BOREDOM) }, modifier = Modifier.weight(1f)) { Text(stringResource(R.string.intent_boredom), maxLines = 1) }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                OutlinedButton(onClick = { viewModel.answerIntent(ScrollIntent.INFORMATION) }, modifier = Modifier.weight(1f)) { Text(stringResource(R.string.intent_information), maxLines = 1) }
+                OutlinedButton(onClick = { viewModel.answerIntent(ScrollIntent.CONNECTION) }, modifier = Modifier.weight(1f)) { Text(stringResource(R.string.intent_connection), maxLines = 1) }
+            }
+            state.followUpReply?.let { reply ->
+                HorizontalDivider()
+                MessageBody(reply, snapshot.labels, voice, onAction = {
+                    viewModel.clearFollowUp()
+                    onAction(it)
+                })
+            }
+        }
+
+        // 2c. Scroll alternatives and sleep coach.
+        AlternativesCard(suggested = suggested, selected = selectedAlternative, onSelect = { selectedAlternative = it })
+        SleepCoachCard()
 
         // 3. Optional reflection note.
         if (reflecting || state.reflectionSaved) {
@@ -141,7 +195,7 @@ fun CoachScreen(
                         stringResource(R.string.coach_inbox_in_app)
                     }
                     Text("$time · $channel", style = MaterialTheme.typography.labelMedium)
-                    MessageBody(item.message, snapshot.labels, onAction)
+                    MessageBody(item.message, snapshot.labels, voice, onAction, bedtime = snapshot.prefs.windDown.bedtime)
                 }
                 HorizontalDivider()
             }
@@ -174,10 +228,10 @@ fun CoachScreen(
 }
 
 @Composable
-private fun CoachCard(message: CoachMessage, labels: Map<String, String>, onAction: (CoachAction) -> Unit) {
-    val text = CoachTexts.render(LocalContext.current.resources, message, labels)
+private fun CoachCard(message: CoachMessage, labels: Map<String, String>, voice: CoachVoice, onAction: (CoachAction) -> Unit) {
+    val text = CoachTexts.render(LocalContext.current.resources, message, labels, voice)
     SectionCard(text.title) {
-        MessageBody(message, labels, onAction, showTitle = false)
+        MessageBody(message, labels, voice, onAction, showTitle = false)
     }
 }
 
@@ -185,10 +239,12 @@ private fun CoachCard(message: CoachMessage, labels: Map<String, String>, onActi
 private fun MessageBody(
     message: CoachMessage,
     labels: Map<String, String>,
+    voice: CoachVoice,
     onAction: (CoachAction) -> Unit,
     showTitle: Boolean = true,
+    bedtime: java.time.LocalTime? = null,
 ) {
-    val text = CoachTexts.render(LocalContext.current.resources, message, labels)
+    val text = CoachTexts.render(LocalContext.current.resources, message, labels, voice, bedtime)
     if (showTitle) Text(text.title, style = MaterialTheme.typography.titleSmall)
     Text(text.body, style = MaterialTheme.typography.bodyLarge)
     if (text.actionLabel != null && message.action != CoachAction.ANSWER_CHECK_IN) {

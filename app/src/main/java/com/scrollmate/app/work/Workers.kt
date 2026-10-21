@@ -51,7 +51,7 @@ class FocusEndWorker(context: Context, params: WorkerParameters) : CoroutineWork
         val refreshed = FocusSessions.refresh(stored, now)
         if (refreshed.status == FocusStatus.COMPLETED) {
             dao.upsert(refreshed.toEntity())
-            container.notifier.postFocusEnded(container.coach.focusFinished(refreshed, now))
+            container.notifier.postFocusEnded(container.coach.focusFinished(refreshed, now), container.settings.current().voice)
         }
         return Result.success()
     }

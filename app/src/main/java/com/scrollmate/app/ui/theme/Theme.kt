@@ -6,71 +6,92 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import com.scrollmate.core.model.ThemeMode
+import com.scrollmate.core.progress.LimitZone
 
-// Calm palette: cream, muted green, anthracite. Over-limit states use a warm sand tone (tertiary),
-// never alarm red. Text/background pairs were chosen for WCAG AA (>= 4.5:1).
-
+// Light: real cream and soft-grey surfaces with dark, readable text – no dark areas.
 private val Light = lightColorScheme(
-    primary = Color(0xFF4E6E58),
+    primary = Color(0xFF3F6B52),
     onPrimary = Color(0xFFFFFFFF),
-    primaryContainer = Color(0xFFD6E5D8),
-    onPrimaryContainer = Color(0xFF10261A),
-    secondary = Color(0xFF5E6A60),
+    primaryContainer = Color(0xFFD4E8DA),
+    onPrimaryContainer = Color(0xFF0E2618),
+    secondary = Color(0xFF5B6470),
     onSecondary = Color(0xFFFFFFFF),
-    secondaryContainer = Color(0xFFE2E6DD),
-    onSecondaryContainer = Color(0xFF1B231D),
-    tertiary = Color(0xFF7D5F33),
+    secondaryContainer = Color(0xFFE5E7EB),
+    onSecondaryContainer = Color(0xFF1F2937),
+    tertiary = Color(0xFF8A5A12),
     onTertiary = Color(0xFFFFFFFF),
-    tertiaryContainer = Color(0xFFF1E2C8),
-    onTertiaryContainer = Color(0xFF2C1E05),
-    background = Color(0xFFF7F3EA),
-    onBackground = Color(0xFF2F3437),
-    surface = Color(0xFFF7F3EA),
-    onSurface = Color(0xFF2F3437),
-    surfaceVariant = Color(0xFFE7E2D6),
-    onSurfaceVariant = Color(0xFF4A4F4C),
-    surfaceTint = Color(0xFF4E6E58),
-    outline = Color(0xFF77736A),
-    outlineVariant = Color(0xFFCFC9BC),
-    surfaceContainerLowest = Color(0xFFFFFDF8),
-    surfaceContainerLow = Color(0xFFF3EEE3),
-    surfaceContainer = Color(0xFFEDE8DC),
-    surfaceContainerHigh = Color(0xFFE8E2D5),
-    surfaceContainerHighest = Color(0xFFE2DCCF),
-    surfaceBright = Color(0xFFF7F3EA),
-    surfaceDim = Color(0xFFDDD8CC),
+    tertiaryContainer = Color(0xFFFCE9C8),
+    onTertiaryContainer = Color(0xFF2E1E03),
+    background = Color(0xFFFAF7F0),
+    onBackground = Color(0xFF1F2937),
+    surface = Color(0xFFFAF7F0),
+    onSurface = Color(0xFF1F2937),
+    surfaceVariant = Color(0xFFE7E5E0),
+    onSurfaceVariant = Color(0xFF4B5563),
+    surfaceTint = Color(0xFF3F6B52),
+    outline = Color(0xFF8B8F96),
+    outlineVariant = Color(0xFFD6D3CC),
+    surfaceContainerLowest = Color(0xFFFFFFFF),
+    surfaceContainerLow = Color(0xFFF3F4F6),
+    surfaceContainer = Color(0xFFEEEFF1),
+    surfaceContainerHigh = Color(0xFFE8E9EC),
+    surfaceContainerHighest = Color(0xFFE2E4E8),
+    surfaceBright = Color(0xFFFAF7F0),
+    surfaceDim = Color(0xFFE2DED5),
 )
 
+// Dark: deep slate/anthracite (#0f172a) with dark cards and high contrast.
 private val Dark = darkColorScheme(
-    primary = Color(0xFFA8C9AF),
-    onPrimary = Color(0xFF13301F),
-    primaryContainer = Color(0xFF364F3E),
-    onPrimaryContainer = Color(0xFFD6E5D8),
-    secondary = Color(0xFFC2CABF),
-    onSecondary = Color(0xFF2C332D),
-    secondaryContainer = Color(0xFF3F4840),
-    onSecondaryContainer = Color(0xFFDEE5DA),
-    tertiary = Color(0xFFE1C38F),
-    onTertiary = Color(0xFF402D0B),
-    tertiaryContainer = Color(0xFF5A4421),
-    onTertiaryContainer = Color(0xFFF6E3C2),
-    background = Color(0xFF1B1E1F),
-    onBackground = Color(0xFFE6E3DA),
-    surface = Color(0xFF1B1E1F),
-    onSurface = Color(0xFFE6E3DA),
-    surfaceVariant = Color(0xFF42463F),
-    onSurfaceVariant = Color(0xFFC6C8BF),
-    surfaceTint = Color(0xFFA8C9AF),
-    outline = Color(0xFF90928A),
-    outlineVariant = Color(0xFF42463F),
-    surfaceContainerLowest = Color(0xFF151819),
-    surfaceContainerLow = Color(0xFF1F2223),
-    surfaceContainer = Color(0xFF232627),
-    surfaceContainerHigh = Color(0xFF2D3031),
-    surfaceContainerHighest = Color(0xFF383B3C),
-    surfaceBright = Color(0xFF3A3D3E),
-    surfaceDim = Color(0xFF1B1E1F),
+    primary = Color(0xFF9DD4AE),
+    onPrimary = Color(0xFF0B2A17),
+    primaryContainer = Color(0xFF1F4430),
+    onPrimaryContainer = Color(0xFFD4E8DA),
+    secondary = Color(0xFFCBD5E1),
+    onSecondary = Color(0xFF1E293B),
+    secondaryContainer = Color(0xFF334155),
+    onSecondaryContainer = Color(0xFFE2E8F0),
+    tertiary = Color(0xFFFCD34D),
+    onTertiary = Color(0xFF3A2A00),
+    tertiaryContainer = Color(0xFF4A3A12),
+    onTertiaryContainer = Color(0xFFFDE8B0),
+    background = Color(0xFF0F172A),
+    onBackground = Color(0xFFE2E8F0),
+    surface = Color(0xFF0F172A),
+    onSurface = Color(0xFFE2E8F0),
+    surfaceVariant = Color(0xFF334155),
+    onSurfaceVariant = Color(0xFFCBD5E1),
+    surfaceTint = Color(0xFF9DD4AE),
+    outline = Color(0xFF64748B),
+    outlineVariant = Color(0xFF334155),
+    surfaceContainerLowest = Color(0xFF0B1220),
+    surfaceContainerLow = Color(0xFF1E293B),
+    surfaceContainer = Color(0xFF1E293B),
+    surfaceContainerHigh = Color(0xFF273449),
+    surfaceContainerHighest = Color(0xFF334155),
+    surfaceBright = Color(0xFF334155),
+    surfaceDim = Color(0xFF0F172A),
 )
+
+/** Status glow colours for the remaining time limit. Used for borders, rings and glows, never for body text. */
+object ZoneColors {
+    val Safe = Color(0xFF22C55E)
+    val Warning = Color(0xFFF59E0B)
+    val Exceeded = Color(0xFFEF4444)
+
+    fun of(zone: LimitZone): Color = when (zone) {
+        LimitZone.SAFE -> Safe
+        LimitZone.WARNING -> Warning
+        LimitZone.EXCEEDED -> Exceeded
+    }
+}
+
+@Composable
+fun isAppInDarkTheme(mode: ThemeMode): Boolean = when (mode) {
+    ThemeMode.SYSTEM -> isSystemInDarkTheme()
+    ThemeMode.LIGHT -> false
+    ThemeMode.DARK -> true
+}
 
 @Composable
 fun ScrollMateTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {

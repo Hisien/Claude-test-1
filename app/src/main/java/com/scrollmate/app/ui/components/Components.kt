@@ -1,6 +1,8 @@
 package com.scrollmate.app.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -92,14 +95,13 @@ fun DemoNotice(modifier: Modifier = Modifier) {
 @Composable
 fun ProgressRing(
     fraction: Float,
-    overLimit: Boolean,
+    color: Color,
     modifier: Modifier = Modifier,
     size: Dp = 180.dp,
     stroke: Dp = 14.dp,
     center: @Composable () -> Unit,
 ) {
     val track = MaterialTheme.colorScheme.surfaceVariant
-    val bar: Color = if (overLimit) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary
     Box(modifier.size(size), contentAlignment = Alignment.Center) {
         Canvas(Modifier.fillMaxSize()) {
             val s = Stroke(width = stroke.toPx(), cap = StrokeCap.Round)
@@ -108,10 +110,30 @@ fun ProgressRing(
             val topLeft = androidx.compose.ui.geometry.Offset(inset, inset)
             drawArc(track, startAngle = -90f, sweepAngle = 360f, useCenter = false, topLeft = topLeft, size = arcSize, style = s)
             if (fraction > 0f) {
-                drawArc(bar, -90f, 360f * fraction.coerceIn(0f, 1f), false, topLeft = topLeft, size = arcSize, style = s)
+                drawArc(color, -90f, 360f * fraction.coerceIn(0f, 1f), false, topLeft = topLeft, size = arcSize, style = s)
             }
         }
         center()
+    }
+}
+
+/** Card with a coloured border and soft glow, used for the limit status (safe / warning / exceeded). */
+@Composable
+fun GlowCard(
+    glow: Color,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) {
+    val shape = MaterialTheme.shapes.medium
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .shadow(elevation = 12.dp, shape = shape, ambientColor = glow, spotColor = glow)
+            .border(BorderStroke(2.dp, glow), shape),
+        shape = shape,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
+    ) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { content() }
     }
 }
 

@@ -14,7 +14,9 @@ import com.scrollmate.app.ui.CoachTexts
 import com.scrollmate.app.ui.MainActivity
 import com.scrollmate.app.ui.Tab
 import com.scrollmate.core.coach.CoachMessage
+import com.scrollmate.core.model.CoachVoice
 import com.scrollmate.core.rules.CoachTrigger
+import java.time.LocalTime
 
 /**
  * Posts calm, low-urgency notifications. Without notification permission nothing is posted;
@@ -24,14 +26,14 @@ class Notifier(private val context: Context) {
 
     fun canPost(): Boolean = UsageAccess(context).notificationsAllowed()
 
-    fun postCoach(trigger: CoachTrigger, labels: Map<String, String>, isDemo: Boolean) {
-        val text = CoachTexts.render(context.resources, trigger.message, labels)
+    fun postCoach(trigger: CoachTrigger, labels: Map<String, String>, isDemo: Boolean, voice: CoachVoice, bedtime: LocalTime) {
+        val text = CoachTexts.render(context.resources, trigger.message, labels, voice, bedtime)
         val title = if (isDemo) context.getString(R.string.notification_demo_prefix, text.title) else text.title
         post(trigger.key.hashCode(), title, text.body, Tab.COACH)
     }
 
-    fun postFocusEnded(message: CoachMessage) {
-        val text = CoachTexts.render(context.resources, message)
+    fun postFocusEnded(message: CoachMessage, voice: CoachVoice) {
+        val text = CoachTexts.render(context.resources, message, voice = voice)
         post(FOCUS_NOTIFICATION_ID, text.title, text.body, Tab.FOCUS)
     }
 
@@ -59,6 +61,7 @@ class Notifier(private val context: Context) {
 
     companion object {
         const val CHANNEL_COACH = "coach"
+        const val CHANNEL_WIND_DOWN = "wind_down"
         private const val FOCUS_NOTIFICATION_ID = 4711
 
         fun createChannels(context: Context) {
@@ -69,6 +72,12 @@ class Notifier(private val context: Context) {
                 NotificationManager.IMPORTANCE_DEFAULT,
             ).apply { description = context.getString(R.string.notification_channel_coach_desc) }
             manager.createNotificationChannel(channel)
+            val windDown = NotificationChannel(
+                CHANNEL_WIND_DOWN,
+                context.getString(R.string.notification_channel_wind_down),
+                NotificationManager.IMPORTANCE_LOW,
+            ).apply { description = context.getString(R.string.notification_channel_wind_down_desc) }
+            manager.createNotificationChannel(windDown)
         }
     }
 }
