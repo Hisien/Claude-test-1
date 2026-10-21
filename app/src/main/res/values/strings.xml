@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ScrollMate</string>
+    <string name="tagline">Mehr Kontrolle über deine Aufmerksamkeit – auf deine Art.</string>
+
+    <!-- Tabs -->
+    <string name="tab_today">Heute</string>
+    <string name="tab_coach">Coach</string>
+    <string name="tab_focus">Fokus</string>
+    <string name="tab_history">Verlauf</string>
+    <string name="tab_settings">Einstellungen</string>
+
+    <!-- Status chip -->
+    <string name="status_live">Live-Daten</string>
+    <string name="status_permission_missing">Berechtigung fehlt</string>
+    <string name="status_demo">Demo-Daten</string>
+    <string name="cd_status_chip">Datenquelle: %1$s</string>
+    <string name="demo_notice">Demo-Daten: Diese Zahlen sind Beispielwerte, nicht deine echte Nutzung.</string>
+
+    <!-- Generic states -->
+    <string name="state_loading">Wird geladen …</string>
+    <string name="state_error">Die Daten konnten gerade nicht geladen werden. Deine Einstellungen sind sicher gespeichert.</string>
+    <string name="generic_app">diese App</string>
+
+    <!-- Durations -->
+    <string name="duration_h_min">%1$d Std. %2$d Min.</string>
+    <string name="duration_min">%1$d Min.</string>
+
+    <!-- Actions -->
+    <string name="action_retry">Erneut versuchen</string>
+    <string name="action_grant_access">Zugriff auf Nutzungsdaten erteilen</string>
+    <string name="action_manage_access">Nutzungszugriff verwalten</string>
+    <string name="action_use_demo">Mit Demo-Daten ausprobieren</string>
+    <string name="action_start_focus">Fokus-Session starten</string>
+    <string name="action_take_break">Okay, kurze Pause</string>
+    <string name="action_answer_check_in">Check-in beantworten</string>
+    <string name="action_reflect">Kurz festhalten</string>
+    <string name="action_open_focus">Zur Fokus-Session</string>
+    <string name="action_check_in_now">Jetzt einchecken</string>
+    <string name="action_open_settings">Zu den Einstellungen</string>
+    <string name="action_check_rules_now">Regeln jetzt prüfen</string>
+    <string name="action_save">Speichern</string>
+    <string name="action_skip">Überspringen</string>
+    <string name="action_done">Fertig</string>
+    <string name="action_end_focus">Vorzeitig beenden</string>
+    <string name="action_allow_notifications">Benachrichtigungen erlauben</string>
+    <string name="action_notification_settings">Benachrichtigungseinstellungen öffnen</string>
+    <string name="action_add_window">+ %1$s</string>
+    <string name="action_choose_apps">Apps auswählen</string>
+    <string name="action_collapse">Liste schließen</string>
+    <string name="action_export">Daten exportieren (CSV)</string>
+    <string name="action_delete_all">Alle lokalen Daten löschen</string>
+    <string name="action_delete">Löschen</string>
+    <string name="action_cancel">Abbrechen</string>
+    <string name="action_ok">OK</string>
+    <string name="action_back">Zurück</string>
+    <string name="action_next">Weiter</string>
+    <string name="action_start">Los geht’s</string>
+    <string name="action_continue_without_data">Ohne Nutzungsdaten fortfahren</string>
+    <string name="action_continue_demo">Mit Demo-Daten fortfahren</string>
+
+    <!-- Accessibility -->
+    <string name="cd_decrease">%1$s verringern</string>
+    <string name="cd_increase">%1$s erhöhen</string>
+    <string name="cd_delete_window">Zeitfenster %1$s löschen</string>
+    <string name="cd_focus_remaining">Noch etwa %1$d Minuten</string>
+    <string name="cd_progress_ring">%1$s von %2$s genutzt, %3$d %% deines Tagesziels</string>
+    <string name="cd_week_chart">Nutzung der letzten 7 Tage: %1$s</string>
+
+    <!-- Permission card -->
+    <string name="permission_card_title">Nutzungsdaten sind noch nicht freigegeben</string>
+    <string name="permission_card_body">ScrollMate kann deine Bildschirmzeit nur anzeigen, wenn du den Zugriff auf Nutzungsdaten in den Systemeinstellungen erlaubst. Du kannst die App auch erst mit Demo-Daten ausprobieren.</string>
+
+    <!-- Today -->
+    <string name="today_of_limit">von %1$s</string>
+    <string name="today_remaining">Noch %1$s bis zu deinem Tagesziel</string>
+    <string name="today_over_by">%1$s über deinem Tagesziel</string>
+    <string name="today_empty">Heute wurde noch keine Nutzung erfasst.</string>
+    <string name="today_top_apps">Meistgenutzte Apps heute</string>
+    <string name="today_top_apps_selected">Deine ausgewählten Apps heute</string>
+    <string name="today_top_apps_empty">Noch keine Nutzung in deiner Auswahl.</string>
+    <string name="today_next">Als Nächstes</string>
+    <string name="today_focus_running">Fokus-Session läuft – noch %1$s.</string>
+    <string name="today_check_in_today">Nächster Check-in: heute um %1$s</string>
+    <string name="today_check_in_tomorrow">Nächster Check-in: morgen um %1$s</string>
+    <string name="today_no_check_in">Kein täglicher Check-in eingestellt.</string>
+    <string name="today_your_goal">Dein persönliches Ziel</string>
+
+    <!-- Coach messages (decided by the rule-based coach in :core) -->
+    <string name="coach_title_threshold">Kurze Zwischenbilanz</string>
+    <string name="coach_body_threshold">Du hast %1$d %% deines Tagesziels erreicht. Magst du eine kurze Pause machen?</string>
+    <string name="coach_title_limit">Tagesziel erreicht</string>
+    <string name="coach_body_limit">Du hast dein Tagesziel für heute erreicht. Magst du eine längere Pause einplanen?</string>
+    <string name="coach_body_limit_focus">Du bist über deinem Limit. Willst du eine %1$d-minütige Fokus-Session starten?</string>
+    <string name="coach_title_repeat">Noch einmal kurz nachgefragt</string>
+    <string name="coach_body_repeat">Du bist weiterhin über deinem Limit – das passiert. Eine %1$d-minütige Fokus-Session wäre jetzt eine Möglichkeit.</string>
+    <string name="coach_title_app_limit">App-Limit erreicht</string>
+    <string name="coach_body_app_limit">Dein Limit für %1$s ist für heute erreicht. Magst du die App für heute schließen?</string>
+    <string name="coach_title_check_in">Check-in</string>
+    <string name="coach_body_check_in">Kurzer Check-in: Scrollst du gerade bewusst?</string>
+    <string name="coach_body_check_in_on_track">Du liegst heute innerhalb deines Ziels – schön. Was hat dir heute geholfen?</string>
+    <string name="coach_title_summary">Dein Tag bisher</string>
+    <string name="coach_body_no_data">Sobald Nutzungsdaten da sind, gebe ich dir hier eine kurze Einschätzung. Den Check-in kannst du schon jetzt nutzen.</string>
+    <string name="coach_body_on_track">Du bist bei %1$d %% deines Tagesziels – gut im Rahmen. Was hilft dir heute?</string>
+    <string name="coach_body_near_limit">Du bist bei %1$d %% deines Tagesziels. Magst du eine kurze Pause machen?</string>
+    <string name="coach_body_over_limit">Du bist über deinem Limit (%1$d %%). Willst du eine %2$d-minütige Fokus-Session starten?</string>
+    <string name="coach_body_gentle_tip">Du bist bei %1$d %% deines Tagesziels. Ein Tipp, falls du magst: Leg das Handy für ein paar Minuten außer Reichweite.</string>
+    <string name="coach_body_gentle_over">Heute ist es mehr geworden als geplant – das passiert. Morgen ist ein neuer Tag.</string>
+    <string name="coach_body_reply_mindful">Schön, dass du das bewusst entscheidest. Viel Freude dabei!</string>
+    <string name="coach_body_reply_autopilot">Danke für deine Ehrlichkeit – das zu bemerken ist schon ein Schritt. Magst du eine %1$d-minütige Fokus-Session starten?</string>
+    <string name="coach_title_focus_done">Fokus-Session beendet</string>
+    <string name="coach_body_focus_done">Du hast %1$d Minuten fokussiert. Was hat dir dabei geholfen?</string>
+    <string name="coach_body_focus_early">Du hast %1$d Minuten fokussiert – jede Minute zählt. Was nimmst du mit?</string>
+
+    <!-- Coach tab -->
+    <string name="coach_break_ack">Gute Idee. Gönn dir ein paar Minuten ohne Bildschirm.</string>
+    <string name="coach_check_in_title">Check-in</string>
+    <string name="check_in_mindful">Ja, bewusst</string>
+    <string name="check_in_autopilot">Eher nicht</string>
+    <string name="coach_notes_title">Deine letzten Notizen</string>
+    <string name="coach_inbox_title">Erinnerungen heute</string>
+    <string name="coach_inbox_empty">Heute gab es noch keine Erinnerungen.</string>
+    <string name="coach_inbox_as_notification">als Benachrichtigung</string>
+    <string name="coach_inbox_in_app">nur in der App</string>
+    <string name="coach_notifications_off">Benachrichtigungen sind aus. Coach-Nachrichten erscheinen deshalb nur hier.</string>
+    <string name="coach_check_now_title">Regeln prüfen</string>
+    <string name="coach_check_now_body">Im Hintergrund prüft ScrollMate etwa alle 15 Minuten. Hier kannst du sofort prüfen lassen, ob eine Erinnerung fällig ist.</string>
+    <string name="coach_daily_check_in_at">Täglicher Check-in um %1$s</string>
+    <string name="check_result_notification">Eine Erinnerung war fällig und wurde als Benachrichtigung gesendet.</string>
+    <string name="check_result_in_app">Eine Erinnerung war fällig. Sie steht oben unter „Erinnerungen heute“.</string>
+    <string name="check_result_nothing">Gerade ist keine Erinnerung fällig.</string>
+    <string name="check_result_failed">Die Prüfung hat gerade nicht geklappt. Versuch es gleich noch einmal.</string>
+
+    <!-- Reflection -->
+    <string name="reflection_title">Kurz festhalten</string>
+    <string name="reflection_hint">Was hat dir heute geholfen? (optional)</string>
+    <string name="reflection_privacy">Deine Notiz bleibt nur auf diesem Gerät.</string>
+    <string name="reflection_saved">Gespeichert. Danke fürs Festhalten.</string>
+
+    <!-- Focus -->
+    <string name="focus_no_blocking">Andere Apps werden nicht gesperrt. Eine Fokus-Session ist ein Timer in ScrollMate, der dich beim Dranbleiben unterstützt.</string>
+    <string name="focus_restriction_unavailable">Eine echte App-Sperre ist bewusst nicht Teil dieser Version.</string>
+    <string name="focus_start_title">Fokus-Session</string>
+    <string name="focus_start_body">Leg das Handy weg und mach etwas anderes – ScrollMate zählt mit und meldet sich am Ende.</string>
+    <string name="focus_duration">Dauer</string>
+    <string name="focus_end_tolerance">Hinweis: Die Benachrichtigung zum Ende kann sich um einige Minuten verzögern, wenn das System Energie spart. In der App läuft der Timer genau.</string>
+    <string name="focus_running_title">Fokus-Session läuft</string>
+    <string name="focus_running_body">Du kannst die Session jederzeit beenden – ganz ohne Nachteile.</string>
+    <string name="focus_reflection_hint">Was nimmst du mit? (optional)</string>
+    <string name="focus_recent_title">Letzte Fokus-Sessions</string>
+    <string name="focus_recent_empty">Noch keine Fokus-Sessions.</string>
+    <string name="focus_status_completed">abgeschlossen</string>
+    <string name="focus_status_early">früher beendet</string>
+    <string name="focus_status_running">läuft</string>
+    <string name="focus_session_row">%1$d.%2$d., %3$s · %4$d Min. · %5$s</string>
+
+    <!-- History -->
+    <string name="history_chart_title">Letzte 7 Tage</string>
+    <string name="history_empty">Für die letzten 7 Tage gibt es noch keine Daten.</string>
+    <string name="history_goal_days">An %1$d von %2$d Tagen im Rahmen deines Ziels.</string>
+    <string name="history_legend">Grün: im Ziel · Sandfarben: darüber · gestrichelte Linie: dein Tageslimit</string>
+    <string name="history_average_title">Dein Durchschnitt</string>
+    <string name="history_average_demo">Im Demo-Modus gibt es keinen Vergleich mit einem persönlichen Durchschnitt.</string>
+    <string name="history_average_not_yet">Den Vergleich mit deinem Durchschnitt zeige ich ab %1$d abgeschlossenen Tagen mit Live-Daten (bisher: %2$d). Mit weniger Tagen wäre er wenig aussagekräftig.</string>
+    <string name="history_average_value">Durchschnitt pro Tag: %1$s</string>
+    <string name="history_today_less">Heute bisher %1$s weniger als im Durchschnitt.</string>
+    <string name="history_today_more">Heute bisher %1$s mehr als im Durchschnitt.</string>
+    <string name="history_days_title">Tage im Detail</string>
+    <string name="history_day_met">im Ziel</string>
+    <string name="history_day_over">über dem Ziel</string>
+    <string name="history_day_no_data">keine Daten</string>
+
+    <!-- Settings -->
+    <string name="settings_data_title">Daten und Berechtigungen</string>
+    <string name="settings_demo_mode">Demo-Modus</string>
+    <string name="settings_demo_mode_desc">Zeigt 7 Tage Beispieldaten für 5 Apps. Ideal zum Ausprobieren ohne Berechtigung.</string>
+    <string name="settings_access_granted">Zugriff auf Nutzungsdaten ist erteilt.</string>
+    <string name="settings_access_missing">Zugriff auf Nutzungsdaten ist nicht erteilt.</string>
+    <string name="settings_access_revoke_hint">Du kannst den Zugriff jederzeit in den Systemeinstellungen unter „Nutzungsdatenzugriff“ wieder entziehen.</string>
+    <string name="settings_notifications_on">Benachrichtigungen sind erlaubt.</string>
+    <string name="settings_notifications_off">Benachrichtigungen sind aus – Coach-Nachrichten erscheinen nur in der App.</string>
+    <string name="settings_goal_title">Ziel</string>
+    <string name="settings_daily_limit">Tageslimit</string>
+    <string name="settings_style_title">Coaching-Stil</string>
+    <string name="settings_rules_title">Erinnerungen und Regeln</string>
+    <string name="settings_delay_notice">Schwellen werden im Hintergrund etwa alle 15 Minuten geprüft (Android-Minimum). Erinnerungen kommen daher mit Verzögerung, bei Energiesparmodus auch später.</string>
+    <string name="settings_thresholds">Warnschwellen</string>
+    <string name="settings_repeat_interval">Wiederholung nach</string>
+    <string name="settings_max_reminders">Max. Erinnerungen pro Tag</string>
+    <string name="settings_none">keine</string>
+    <string name="settings_check_in_time">Check-in um %1$s</string>
+    <string name="settings_focus_duration">Standarddauer Fokus-Session</string>
+    <string name="settings_windows_title">Zeitfenster</string>
+    <string name="settings_windows_desc">Im Stil „Fokuszeiten“ gelten Erinnerungen nur innerhalb dieser Zeitfenster. Fenster über Mitternacht (z. B. 22:00–07:00) sind möglich.</string>
+    <string name="settings_windows_empty">Noch keine Zeitfenster.</string>
+    <string name="window_study">Lernen</string>
+    <string name="window_sleep">Schlafenszeit</string>
+    <string name="window_from">Von %1$s</string>
+    <string name="window_to">Bis %1$s</string>
+    <string name="settings_apps_title">App-Auswahl</string>
+    <string name="settings_apps_all">Keine Auswahl: Es zählen alle Apps außer ScrollMate und dem Startbildschirm.</string>
+    <string name="settings_apps_count">%1$d Apps ausgewählt</string>
+    <string name="settings_apps_demo_hint">Im Demo-Modus werden die Demo-Apps verwendet.</string>
+    <string name="settings_apps_empty">Keine Apps gefunden.</string>
+    <string name="settings_app_limit">Limit für %1$s</string>
+    <string name="settings_app_limit_off">aus</string>
+    <string name="settings_manage_title">Daten verwalten</string>
+    <string name="settings_manage_desc">Alle Daten liegen nur auf diesem Gerät. Du kannst sie exportieren oder vollständig löschen.</string>
+    <string name="export_done">Export gespeichert.</string>
+    <string name="export_failed">Export hat nicht geklappt.</string>
+    <string name="delete_confirm_title">Alle Daten löschen?</string>
+    <string name="delete_confirm_body">Nutzungsverlauf, Fokus-Sessions, Notizen und Einstellungen werden von diesem Gerät gelöscht. Danach startet ScrollMate wieder mit dem Onboarding.</string>
+    <string name="settings_about_title">Über ScrollMate</string>
+    <string name="settings_about_body">ScrollMate sperrt keine anderen Apps. Es hat keinen Internetzugriff, braucht kein Konto, und alle Daten bleiben auf deinem Gerät.</string>
+
+    <!-- Rules -->
+    <string name="rule_threshold_total">Erinnerungen an den Warnschwellen</string>
+    <string name="rule_threshold_app">Erinnerungen bei App-Limits</string>
+    <string name="rule_strict_repeat">Wiederholung bei Überschreitung</string>
+    <string name="rule_strict_repeat_desc">Nur im Stil „Konsequent“</string>
+    <string name="rule_check_in">Täglicher Check-in</string>
+
+    <!-- Coaching styles -->
+    <string name="style_gentle">Sanft</string>
+    <string name="style_gentle_desc">Nur positives Feedback und freiwillige Tipps. Keine Erinnerungen außer dem täglichen Check-in.</string>
+    <string name="style_active">Aktiv</string>
+    <string name="style_active_desc">Erinnerungen an deinen Warnschwellen und kurze Check-ins.</string>
+    <string name="style_strict">Konsequent</string>
+    <string name="style_strict_desc">Wie Aktiv, plus bei 100 Prozent ein direkter Vorschlag für eine Fokus-Session und eine Wiederholung nach deinem Intervall. Andere Apps werden dabei nicht gesperrt.</string>
+    <string name="style_windows">Fokuszeiten</string>
+    <string name="style_windows_desc">Erinnerungen gelten nur in Zeitfenstern, die du selbst festlegst.</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_step">Schritt %1$d von %2$d</string>
+    <string name="onboarding_welcome_title">Willkommen bei ScrollMate</string>
+    <string name="onboarding_welcome_1">Ein freundlicher Coach, der dir hilft, bewusster mit deinem Handy umzugehen – ohne Schuldgefühle.</string>
+    <string name="onboarding_welcome_2">Du bestimmst Ziel, Limit und wie deutlich du erinnert werden möchtest.</string>
+    <string name="onboarding_welcome_3">Ehrlich: ScrollMate erinnert und begleitet, sperrt aber keine anderen Apps.</string>
+    <string name="onboarding_goal_title">Dein Ziel</string>
+    <string name="onboarding_goal_hint">Persönliches Ziel, z. B. „Abends weniger scrollen“ (optional)</string>
+    <string name="onboarding_goal_note">Du kannst Ziel und Limit jederzeit in den Einstellungen ändern.</string>
+    <string name="onboarding_style_title">Wie soll dich ScrollMate begleiten?</string>
+    <string name="onboarding_windows_note">Zeitfenster legst du danach in den Einstellungen fest.</string>
+    <string name="onboarding_data_title">Welche Daten ScrollMate nutzt</string>
+    <string name="onboarding_data_1">Mit deiner Erlaubnis liest ScrollMate, wie lange Apps heute im Vordergrund waren – keine Inhalte, keine Nachrichten.</string>
+    <string name="onboarding_data_2">Alles bleibt auf deinem Gerät. ScrollMate hat keinen Internetzugriff und braucht kein Konto.</string>
+    <string name="onboarding_data_3">Du kannst die Erlaubnis jederzeit in den Systemeinstellungen entziehen. ScrollMate funktioniert dann mit Demo-Daten weiter.</string>
+    <string name="onboarding_permission_title">Nutzungsdaten freigeben?</string>
+    <string name="onboarding_permission_body">Android öffnet dafür die Systemeinstellungen. Wähle dort ScrollMate aus und erlaube den Zugriff. Du kannst auch erst einmal mit Demo-Daten starten.</string>
+    <string name="onboarding_notifications_note">Ohne Benachrichtigungen zeigt ScrollMate Coach-Nachrichten nur in der App.</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel_coach">Coach</string>
+    <string name="notification_channel_coach_desc">Freundliche Erinnerungen an deine selbst gesetzten Ziele und den täglichen Check-in.</string>
+    <string name="notification_demo_prefix">%1$s (Demo)</string>
+</resources>
