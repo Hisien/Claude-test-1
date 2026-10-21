@@ -2,7 +2,9 @@ package com.scrollmate.app.ui.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -64,31 +66,30 @@ fun StatusChip(state: DataSourceState, modifier: Modifier = Modifier) {
         )
     }
     val description = stringResource(R.string.cd_status_chip, label)
-    Surface(
-        color = container,
-        shape = MaterialTheme.shapes.large,
-        modifier = modifier.semantics(mergeDescendants = true) { contentDescription = description },
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+            .glass(RoundedCornerShape(999.dp))
+            .background(container.copy(alpha = 0.35f))
+            .semantics(mergeDescendants = true) { contentDescription = description }
+            .padding(horizontal = 11.dp, vertical = 7.dp),
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-        ) {
-            Icon(icon, contentDescription = null, modifier = Modifier.size(18.dp))
-            Spacer(Modifier.width(6.dp))
-            Text(label, style = MaterialTheme.typography.labelLarge)
-        }
+        Icon(icon, contentDescription = null, modifier = Modifier.size(15.dp))
+        Spacer(Modifier.width(5.dp))
+        Text(label, style = MaterialTheme.typography.labelMedium)
     }
 }
 
 /** Shown on every screen that displays demo numbers. */
 @Composable
 fun DemoNotice(modifier: Modifier = Modifier) {
-    Surface(color = MaterialTheme.colorScheme.secondaryContainer, shape = MaterialTheme.shapes.medium, modifier = modifier) {
-        Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Filled.Info, contentDescription = null)
-            Spacer(Modifier.width(8.dp))
-            Text(stringResource(R.string.demo_notice), style = MaterialTheme.typography.bodyMedium)
-        }
+    Row(
+        modifier.fillMaxWidth().glass(MaterialTheme.shapes.medium).padding(14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(Icons.Filled.Info, contentDescription = null, tint = MaterialTheme.colorScheme.secondary)
+        Spacer(Modifier.width(10.dp))
+        Text(stringResource(R.string.demo_notice), style = MaterialTheme.typography.bodyMedium)
     }
 }
 
@@ -117,24 +118,23 @@ fun ProgressRing(
     }
 }
 
-/** Card with a coloured border and soft glow, used for the limit status (safe / warning / exceeded). */
+/** Glass card with a coloured edge and soft glow, used for the limit status (safe / warning / exceeded). */
 @Composable
 fun GlowCard(
     glow: Color,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
-    val shape = MaterialTheme.shapes.medium
-    Card(
+    val shape = MaterialTheme.shapes.extraLarge
+    Column(
         modifier = modifier
             .fillMaxWidth()
-            .shadow(elevation = 12.dp, shape = shape, ambientColor = glow, spotColor = glow)
-            .border(BorderStroke(2.dp, glow), shape),
-        shape = shape,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
-    ) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { content() }
-    }
+            .shadow(elevation = 24.dp, shape = shape, ambientColor = glow, spotColor = glow)
+            .glass(shape, strong = true)
+            .border(BorderStroke(1.5.dp, glow.copy(alpha = 0.55f)), shape)
+            .padding(20.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) { content() }
 }
 
 @Composable
@@ -143,16 +143,17 @@ fun SectionCard(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
+    Column(
+        modifier
+            .fillMaxWidth()
+            .glass(MaterialTheme.shapes.large)
+            .padding(18.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            if (title != null) {
-                Text(title, style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() })
-            }
-            content()
+        if (title != null) {
+            Text(title, style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() })
         }
+        content()
     }
 }
 

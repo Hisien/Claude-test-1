@@ -42,6 +42,7 @@ import com.scrollmate.app.R
 import com.scrollmate.app.ui.MainUiState
 import com.scrollmate.app.ui.MainViewModel
 import com.scrollmate.app.ui.SystemActions
+import com.scrollmate.app.ui.components.GlassBackground
 import com.scrollmate.app.ui.components.InfoRow
 import com.scrollmate.app.ui.components.Stepper
 import com.scrollmate.app.ui.components.durationText
@@ -64,7 +65,7 @@ fun OnboardingScreen(state: MainUiState, viewModel: MainViewModel, actions: Syst
 
     fun finish(demo: Boolean) = viewModel.completeOnboarding(goal.trim(), limit, style, demo)
 
-    Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+    GlassBackground {
         Column(Modifier.fillMaxSize().safeDrawingPadding().padding(16.dp)) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Text(

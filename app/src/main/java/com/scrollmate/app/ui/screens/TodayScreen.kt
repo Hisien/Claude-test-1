@@ -33,6 +33,20 @@ import com.scrollmate.app.ui.components.ErrorState
 import com.scrollmate.app.ui.components.LoadingState
 import com.scrollmate.app.ui.components.PermissionCard
 import com.scrollmate.app.ui.components.GlowCard
+import com.scrollmate.app.ui.components.glass
+import com.scrollmate.app.ui.theme.HeroNumber
+import com.scrollmate.app.ui.theme.LocalGlass
+import com.scrollmate.core.winddown.WindDown
+import java.time.Duration
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Face
+import androidx.compose.material3.Icon
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import com.scrollmate.app.ui.components.ProgressRing
 import com.scrollmate.app.ui.theme.ZoneColors
 import com.scrollmate.core.progress.LimitZone
@@ -100,20 +114,29 @@ private fun ProgressSection(snapshot: UsageSnapshot) {
             Text(
                 zoneLabel,
                 style = MaterialTheme.typography.labelLarge,
-                modifier = Modifier.padding(start = 8.dp),
+                color = glow,
+                modifier = Modifier.padding(start = 8.dp).weight(1f),
+            )
+            Text(
+                stringResource(R.string.today_percent_of_goal, progress.percent),
+                style = MaterialTheme.typography.labelLarge,
+                color = LocalGlass.current.textMuted,
             )
         }
         Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             ProgressRing(
                 fraction = progress.ringFraction,
                 color = glow,
+                size = 224.dp,
+                stroke = 16.dp,
                 modifier = Modifier.semantics(mergeDescendants = true) { contentDescription = ringDescription },
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(used, style = MaterialTheme.typography.headlineSmall, textAlign = TextAlign.Center)
+                    Text(clockText(progress.used), style = HeroNumber, textAlign = TextAlign.Center)
                     Text(
-                        stringResource(R.string.today_of_limit, limit),
+                        stringResource(R.string.today_of_limit_short, clockText(progress.limit)),
                         style = MaterialTheme.typography.bodyMedium,
+                        color = LocalGlass.current.textMuted,
                         textAlign = TextAlign.Center,
                     )
                 }
@@ -148,7 +171,7 @@ private fun TopAppsSection(snapshot: UsageSnapshot) {
             Text(stringResource(R.string.today_top_apps_empty), style = MaterialTheme.typography.bodyMedium)
         }
         val max = top.firstOrNull()?.second?.toMillis()?.coerceAtLeast(1) ?: 1
-        top.forEach { (pkg, d) ->
+        top.forEachIndexed { index, (pkg, d) ->
             val label = snapshot.labels[pkg] ?: pkg
             val time = durationText(d)
             Column(
@@ -159,10 +182,17 @@ private fun TopAppsSection(snapshot: UsageSnapshot) {
                     Text(label, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
                     Text(time, style = MaterialTheme.typography.bodyLarge)
                 }
-                LinearProgressIndicator(
-                    progress = { d.toMillis().toFloat() / max.toFloat() },
-                    modifier = Modifier.fillMaxWidth(),
-                )
+                val fraction = (d.toMillis().toFloat() / max.toFloat()).coerceIn(0.02f, 1f)
+                val colors = BAR_GRADIENTS[index % BAR_GRADIENTS.size]
+                Box(Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(999.dp)).background(LocalGlass.current.fill)) {
+                    Box(
+                        Modifier
+                            .fillMaxWidth(fraction)
+                            .height(8.dp)
+                            .clip(RoundedCornerShape(999.dp))
+                            .background(Brush.horizontalGradient(colors)),
+                    )
+                }
             }
         }
     }
@@ -175,9 +205,9 @@ private fun NextUpSection(
     onOpenFocus: () -> Unit,
     onOpenCoach: () -> Unit,
 ) {
-    SectionCard(stringResource(R.string.today_next)) {
-        val running = focusState.running
-        if (running != null) {
+    val running = focusState.running
+    if (running != null) {
+        SectionCard(stringResource(R.string.today_next)) {
             Text(
                 stringResource(R.string.today_focus_running, durationText(focusState.remaining)),
                 style = MaterialTheme.typography.bodyLarge,
@@ -185,17 +215,70 @@ private fun NextUpSection(
             Button(onClick = onOpenFocus, modifier = Modifier.fillMaxWidth()) {
                 Text(stringResource(R.string.action_open_focus))
             }
-        } else {
-            val checkIn = snapshot.prefs.reminders.checkInTime
-            val text = when {
-                checkIn == null -> stringResource(R.string.today_no_check_in)
-                snapshot.now.toLocalTime().isBefore(checkIn) -> stringResource(R.string.today_check_in_today, checkIn.hhmm())
-                else -> stringResource(R.string.today_check_in_tomorrow, checkIn.hhmm())
-            }
-            Text(text, style = MaterialTheme.typography.bodyLarge)
-            OutlinedButton(onClick = onOpenCoach, modifier = Modifier.fillMaxWidth()) {
-                Text(stringResource(R.string.action_check_in_now))
-            }
         }
+        return
+    }
+    val checkIn = snapshot.prefs.reminders.checkInTime
+    val checkInValue = when {
+        checkIn == null -> stringResource(R.string.tile_off)
+        snapshot.now.toLocalTime().isBefore(checkIn) -> checkIn.hhmm()
+        else -> stringResource(R.string.tile_tomorrow, checkIn.hhmm())
+    }
+    val wd = snapshot.prefs.windDown
+    val windDownValue = if (wd.enabled) stringResource(R.string.tile_from, WindDown.start(wd).hhmm()) else stringResource(R.string.tile_off)
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        Tile(
+            icon = Icons.Filled.Face,
+            iconTint = Color(0xFF7DD3FC),
+            label = stringResource(R.string.tile_check_in),
+            value = checkInValue,
+            onClick = onOpenCoach,
+            modifier = Modifier.weight(1f),
+        )
+        Tile(
+            icon = Icons.Filled.DateRange,
+            iconTint = Color(0xFFC4B5FD),
+            label = stringResource(R.string.tile_wind_down),
+            value = windDownValue,
+            onClick = null,
+            modifier = Modifier.weight(1f),
+        )
     }
 }
+
+@Composable
+private fun Tile(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    iconTint: Color,
+    label: String,
+    value: String,
+    onClick: (() -> Unit)?,
+    modifier: Modifier = Modifier,
+) {
+    val shape = MaterialTheme.shapes.medium
+    val base = modifier.glass(shape)
+    Column(
+        (if (onClick != null) base.clickable(onClick = onClick) else base)
+            .semantics(mergeDescendants = true) { }
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        Icon(icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(20.dp))
+        Text(label, style = MaterialTheme.typography.labelMedium, color = LocalGlass.current.textMuted)
+        Text(value, style = MaterialTheme.typography.titleLarge)
+    }
+}
+
+/** "1:27" for 87 minutes. */
+private fun clockText(d: Duration): String {
+    val m = d.toMinutes().coerceAtLeast(0)
+    return "%d:%02d".format(m / 60, m % 60)
+}
+
+private val BAR_GRADIENTS = listOf(
+    listOf(Color(0xFFF472B6), Color(0xFFFB7185)),
+    listOf(Color(0xFFA78BFA), Color(0xFF818CF8)),
+    listOf(Color(0xFF818CF8), Color(0xFF60A5FA)),
+    listOf(Color(0xFFC084FC), Color(0xFFA78BFA)),
+    listOf(Color(0xFF2DD4BF), Color(0xFF34D399)),
+)

@@ -11,6 +11,30 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
+import com.scrollmate.app.ui.components.GlassBackground
+import com.scrollmate.app.ui.components.glass
+import com.scrollmate.app.ui.theme.LocalGlass
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Face
@@ -116,7 +140,7 @@ fun ScrollMateRoot(
 
     val prefs = state.prefs
     when {
-        prefs == null -> LoadingState()
+        prefs == null -> GlassBackground { LoadingState() }
         !prefs.onboardingCompleted -> OnboardingScreen(state = state, viewModel = mainViewModel, actions = actions)
         else -> MainScaffold(mainViewModel, focusViewModel, state, actions, requestedTab, onRequestedTabConsumed)
     }
@@ -150,60 +174,32 @@ private fun MainScaffold(
     }
     val focusState by focusViewModel.state.collectAsStateWithLifecycle()
 
+    val title = if (showNotifications) stringResource(R.string.notif_history_title) else stringResource(tab.label)
+    GlassBackground {
     Scaffold(
+        containerColor = Color.Transparent,
         topBar = {
-            TopAppBar(
-                title = {
-                    if (showNotifications) {
-                        Text(stringResource(R.string.notif_history_title))
-                    } else {
-                        val avatar = state.prefs?.voice?.avatar.orEmpty()
-                        Text("$avatar ${stringResource(tab.label)}".trim())
-                    }
-                },
-                navigationIcon = {
-                    if (showNotifications) {
-                        IconButton(onClick = { closeNotifications() }) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back))
-                        }
-                    }
-                },
-                actions = {
-                    if (!showNotifications) {
-                        state.snapshot?.let { StatusChip(it.state) }
-                        val bellDescription = if (unread > 0) {
-                            stringResource(R.string.cd_bell_unread, unread)
-                        } else {
-                            stringResource(R.string.cd_bell)
-                        }
-                        IconButton(onClick = {
-                            showNotifications = true
-                            mainViewModel.markNotificationsSeen()
-                        }) {
-                            BadgedBox(badge = {
-                                if (unread > 0) Badge { Text(if (unread > 99) "99+" else unread.toString()) }
-                            }) {
-                                Icon(Icons.Filled.Notifications, contentDescription = bellDescription)
-                            }
-                        }
-                    }
+            GlassHeader(
+                title = title,
+                avatar = state.prefs?.voice?.avatar.orEmpty(),
+                status = state.snapshot?.state,
+                unread = unread,
+                showBack = showNotifications,
+                onBack = { closeNotifications() },
+                onBell = {
+                    showNotifications = true
+                    mainViewModel.markNotificationsSeen()
                 },
             )
         },
         bottomBar = {
-            NavigationBar {
-                Tab.entries.forEach { t ->
-                    NavigationBarItem(
-                        selected = tab == t && !showNotifications,
-                        onClick = {
-                            if (showNotifications) closeNotifications()
-                            tab = t
-                        },
-                        icon = { Icon(t.icon, contentDescription = null) },
-                        label = { Text(stringResource(t.label)) },
-                    )
-                }
-            }
+            GlassNavBar(
+                selected = if (showNotifications) null else tab,
+                onSelect = { t ->
+                    if (showNotifications) closeNotifications()
+                    tab = t
+                },
+            )
         },
     ) { padding ->
         val modifier = Modifier.padding(padding)
@@ -252,6 +248,7 @@ private fun MainScaffold(
             Tab.SETTINGS -> SettingsScreen(state = state, viewModel = mainViewModel, actions = actions, modifier = modifier)
         }
     }
+    }
 }
 
 private fun Context.startSafely(intent: Intent) {
@@ -259,5 +256,107 @@ private fun Context.startSafely(intent: Intent) {
         startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
     } catch (e: ActivityNotFoundException) {
         startActivity(Intent(Settings.ACTION_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+    }
+}
+
+
+@Composable
+private fun GlassHeader(
+    title: String,
+    avatar: String,
+    status: com.scrollmate.core.model.DataSourceState?,
+    unread: Int,
+    showBack: Boolean,
+    onBack: () -> Unit,
+    onBell: () -> Unit,
+) {
+    val g = LocalGlass.current
+    val date = remember {
+        java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("EEEE, d. MMMM", java.util.Locale.GERMAN))
+    }
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .statusBarsPadding()
+            .padding(start = 20.dp, end = 20.dp, top = 12.dp, bottom = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        if (showBack) {
+            IconButton(onClick = onBack, modifier = Modifier.size(48.dp).glass(MaterialTheme.shapes.small)) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back))
+            }
+        } else {
+            Box(Modifier.size(48.dp).glass(MaterialTheme.shapes.small), contentAlignment = Alignment.Center) {
+                Text(avatar, style = MaterialTheme.typography.titleLarge)
+            }
+        }
+        Column(Modifier.weight(1f)) {
+            if (!showBack) {
+                Text(date, style = MaterialTheme.typography.labelMedium, color = g.textMuted, maxLines = 1)
+            }
+            Text(title, style = MaterialTheme.typography.headlineSmall, maxLines = 1)
+        }
+        if (!showBack) {
+            status?.let { StatusChip(it) }
+            val bellDescription = if (unread > 0) stringResource(R.string.cd_bell_unread, unread) else stringResource(R.string.cd_bell)
+            IconButton(onClick = onBell, modifier = Modifier.size(48.dp).glass(MaterialTheme.shapes.small)) {
+                BadgedBox(badge = {
+                    if (unread > 0) Badge(containerColor = Color(0xFFF43F5E), contentColor = Color.White) {
+                        Text(if (unread > 99) "99+" else unread.toString())
+                    }
+                }) {
+                    Icon(Icons.Filled.Notifications, contentDescription = bellDescription)
+                }
+            }
+        }
+    }
+}
+
+/** Floating glass pill with the five tabs; the active tab glows mint. */
+@Composable
+private fun GlassNavBar(selected: Tab?, onSelect: (Tab) -> Unit) {
+    val g = LocalGlass.current
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .navigationBarsPadding()
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .shadow(16.dp, RoundedCornerShape(26.dp), ambientColor = Color.Black.copy(alpha = 0.4f), spotColor = Color.Black.copy(alpha = 0.4f))
+            .clip(RoundedCornerShape(26.dp))
+            .background(g.nav)
+            .border(1.dp, g.edge, RoundedCornerShape(26.dp))
+            .padding(horizontal = 8.dp, vertical = 8.dp)
+            .selectableGroup(),
+        horizontalArrangement = Arrangement.SpaceAround,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Tab.entries.forEach { t ->
+            val active = t == selected
+            val label = stringResource(t.label)
+            Column(
+                Modifier
+                    .clip(RoundedCornerShape(18.dp))
+                    .background(if (active) MaterialTheme.colorScheme.primary.copy(alpha = 0.18f) else Color.Transparent)
+                    .selectable(selected = active, onClick = { onSelect(t) }, role = Role.Tab)
+                    .sizeIn(minWidth = 56.dp, minHeight = 52.dp)
+                    .padding(horizontal = 6.dp, vertical = 6.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+            ) {
+                Icon(
+                    t.icon,
+                    contentDescription = null,
+                    tint = if (active) MaterialTheme.colorScheme.primary else g.textMuted,
+                    modifier = Modifier.size(22.dp),
+                )
+                Text(
+                    label,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = if (active) MaterialTheme.colorScheme.primary else g.textMuted,
+                    maxLines = 1,
+                )
+            }
+        }
     }
 }

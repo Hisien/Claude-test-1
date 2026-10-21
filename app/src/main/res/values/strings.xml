@@ -445,4 +445,13 @@
     <string name="notif_yesterday">Gestern</string>
     <string name="cd_bell">Benachrichtigungen</string>
     <string name="cd_bell_unread">Benachrichtigungen, %1$d neu</string>
+
+    <!-- ===== Glass redesign ===== -->
+    <string name="today_percent_of_goal">%1$d %% des Ziels</string>
+    <string name="today_of_limit_short">von %1$s Std.</string>
+    <string name="tile_check_in">Nächster Check-in</string>
+    <string name="tile_wind_down">Abendmodus</string>
+    <string name="tile_off">aus</string>
+    <string name="tile_tomorrow">morgen %1$s</string>
+    <string name="tile_from">ab %1$s</string>
 </resources>

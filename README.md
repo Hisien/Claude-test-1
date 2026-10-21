@@ -102,7 +102,7 @@ Harsch und Aggressiv sind bewusst konfrontativ und nur auf ausdrücklichen Wunsc
 
 **Benachrichtigungs-Verlauf (Glocke oben rechts).** Alle Erinnerungen der letzten 30 Tage mit Uhrzeit, nach Tagen gruppiert, neueste zuerst – egal ob sie als Benachrichtigung oder nur in der App gezeigt wurden. Jeder Eintrag zeigt Titel, Text in der Tonalität, in der er gesendet wurde, und ob es Demo-Daten waren. Ein Zähler an der Glocke zeigt neue Einträge seit dem letzten Öffnen. Auch „Fokus-Session beendet“ wird jetzt protokolliert. (Datenbank-Version 2, Migration ergänzt Tonalität und Demo-Kennzeichen.)
 
-**Erscheinungsbild.** Umschalter Hell / Dunkel / Wie im System. Hell: Creme- und Soft-Grau-Flächen mit dunkler Schrift. Dunkel: tiefes Slate (`#0f172a`) mit dunklen Karten. Statusleisten-Symbole folgen der App-Einstellung.
+**Design „Glas & Dunkel“.** Nachthimmel-Hintergrund (`#0B1020`) mit weichen farbigen Lichtflecken, halbtransparente Glaskarten mit hellem Rand, Akzent Mint (`#6EE7B7`), große Zahl im Fortschrittsring, Kacheln für Check-in und Abendmodus, Verlaufsbalken für die Top-Apps, schwebende Glas-Navigation unten und eine Kopfzeile mit Avatar, Datum, Status-Chip und Glocke. Umschalter Hell / Dunkel / Wie im System: Hell ist dieselbe Idee auf warmem, hellem Grund mit milchigem Glas. Statusleisten-Symbole folgen der App-Einstellung. Schrift: Systemschrift in kräftigen Schnitten (Manrope aus dem Entwurf konnte in der Build-Umgebung nicht geladen werden).
 
 **Status-Glow.** Ring und Rahmen der Heute-Karte leuchten je nach Verbrauch: unter 70 % grün (`#22c55e`), 70–99 % orange (`#f59e0b`), ab 100 % rot (`#ef4444`). Zusätzlich steht der Status als Text daneben („Sicherer Bereich“, „Warnstufe“, „Limit überschritten“), damit er nicht nur an der Farbe hängt.
 
