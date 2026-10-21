@@ -14,6 +14,9 @@ import com.scrollmate.app.data.toEntity
 import com.scrollmate.app.data.toModel
 import com.scrollmate.core.focus.FocusSessions
 import com.scrollmate.core.model.FocusStatus
+import com.scrollmate.core.model.RuleId
+import com.scrollmate.core.rules.CoachTrigger
+import com.scrollmate.core.rules.NotificationKeys
 import java.time.Duration
 import java.util.concurrent.TimeUnit
 
@@ -51,7 +54,17 @@ class FocusEndWorker(context: Context, params: WorkerParameters) : CoroutineWork
         val refreshed = FocusSessions.refresh(stored, now)
         if (refreshed.status == FocusStatus.COMPLETED) {
             dao.upsert(refreshed.toEntity())
-            container.notifier.postFocusEnded(container.coach.focusFinished(refreshed, now), container.settings.current().voice)
+            val prefs = container.settings.current()
+            val message = container.coach.focusFinished(refreshed, now)
+            val canPost = container.notifier.canPost()
+            val date = now.atZone(container.zone()).toLocalDate()
+            val trigger = CoachTrigger(
+                RuleId.FOCUS_END, null, NotificationKeys.key(date, RuleId.FOCUS_END, null, refreshed.id), message, false,
+            )
+            // Logged for the notification history; the key contains the session id, so it is unique.
+            val inserted = container.database.notificationRecordDao()
+                .insert(trigger.toEntity(now, shown = true, delivered = canPost, voice = prefs.voice)) != -1L
+            if (inserted) container.notifier.postFocusEnded(message, prefs.voice)
         }
         return Result.success()
     }

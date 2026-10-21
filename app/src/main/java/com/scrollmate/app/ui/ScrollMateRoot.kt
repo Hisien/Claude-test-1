@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
@@ -13,11 +14,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -44,6 +50,7 @@ import com.scrollmate.app.ui.components.StatusChip
 import com.scrollmate.app.ui.screens.CoachScreen
 import com.scrollmate.app.ui.screens.FocusScreen
 import com.scrollmate.app.ui.screens.HistoryScreen
+import com.scrollmate.app.ui.screens.NotificationsScreen
 import com.scrollmate.app.ui.screens.OnboardingScreen
 import com.scrollmate.app.ui.screens.SettingsScreen
 import com.scrollmate.app.ui.screens.TodayScreen
@@ -126,9 +133,18 @@ private fun MainScaffold(
     onRequestedTabConsumed: () -> Unit,
 ) {
     var tab by rememberSaveable { mutableStateOf(Tab.TODAY) }
+    var showNotifications by rememberSaveable { mutableStateOf(false) }
+    val unread by mainViewModel.unreadNotifications.collectAsStateWithLifecycle()
+    val history by mainViewModel.notificationHistory.collectAsStateWithLifecycle()
+    fun closeNotifications() {
+        showNotifications = false
+        mainViewModel.markNotificationsSeen()
+    }
+    BackHandler(enabled = showNotifications) { closeNotifications() }
     LaunchedEffect(requestedTab) {
         if (requestedTab != null) {
             tab = requestedTab
+            showNotifications = false
             onRequestedTabConsumed()
         }
     }
@@ -138,11 +154,39 @@ private fun MainScaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    val avatar = state.prefs?.voice?.avatar.orEmpty()
-                    Text("$avatar ${stringResource(tab.label)}".trim())
+                    if (showNotifications) {
+                        Text(stringResource(R.string.notif_history_title))
+                    } else {
+                        val avatar = state.prefs?.voice?.avatar.orEmpty()
+                        Text("$avatar ${stringResource(tab.label)}".trim())
+                    }
+                },
+                navigationIcon = {
+                    if (showNotifications) {
+                        IconButton(onClick = { closeNotifications() }) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back))
+                        }
+                    }
                 },
                 actions = {
-                    state.snapshot?.let { StatusChip(it.state, Modifier.padding(end = 12.dp)) }
+                    if (!showNotifications) {
+                        state.snapshot?.let { StatusChip(it.state) }
+                        val bellDescription = if (unread > 0) {
+                            stringResource(R.string.cd_bell_unread, unread)
+                        } else {
+                            stringResource(R.string.cd_bell)
+                        }
+                        IconButton(onClick = {
+                            showNotifications = true
+                            mainViewModel.markNotificationsSeen()
+                        }) {
+                            BadgedBox(badge = {
+                                if (unread > 0) Badge { Text(if (unread > 99) "99+" else unread.toString()) }
+                            }) {
+                                Icon(Icons.Filled.Notifications, contentDescription = bellDescription)
+                            }
+                        }
+                    }
                 },
             )
         },
@@ -150,8 +194,11 @@ private fun MainScaffold(
             NavigationBar {
                 Tab.entries.forEach { t ->
                     NavigationBarItem(
-                        selected = tab == t,
-                        onClick = { tab = t },
+                        selected = tab == t && !showNotifications,
+                        onClick = {
+                            if (showNotifications) closeNotifications()
+                            tab = t
+                        },
                         icon = { Icon(t.icon, contentDescription = null) },
                         label = { Text(stringResource(t.label)) },
                     )
@@ -160,6 +207,16 @@ private fun MainScaffold(
         },
     ) { padding ->
         val modifier = Modifier.padding(padding)
+        if (showNotifications) {
+            NotificationsScreen(
+                items = history,
+                currentVoice = state.prefs?.voice ?: CoachVoice.MOUSE,
+                bedtime = state.prefs?.windDown?.bedtime ?: java.time.LocalTime.of(22, 30),
+                notificationsAllowed = state.notificationsAllowed,
+                modifier = modifier,
+            )
+            return@Scaffold
+        }
         when (tab) {
             Tab.TODAY -> TodayScreen(
                 state = state,

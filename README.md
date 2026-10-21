@@ -100,6 +100,8 @@ Harsch und Aggressiv sind bewusst konfrontativ und nur auf ausdrücklichen Wunsc
 **Abendmodus (Schlafenszeit-Sperre).** Du stellst Schlafenszeit (Standard 22:30), Aufstehzeit (06:30) und den Vorlauf (Standard 30 Min.) ein und wählst die Apps. Beim Einschalten werden installierte Feed-Apps (Instagram, TikTok, YouTube, …) vorgeschlagen. Ab Vorlauf bis zur Aufstehzeit legt ScrollMate über diese Apps ein ruhiges Vollbild mit geführter 4-7-8-Atmung und dem Hinweis auf die Schlafenszeit. „Zum Startbildschirm“ und die Zurück-Taste verlassen die App; „Heute Abend aussetzen“ pausiert bis zum nächsten Abend (damit niemand ausgesperrt wird). Zu Beginn des Vorlaufs kommt zusätzlich eine Erinnerung in der gewählten Tonalität.
 *Technik:* Vordergrunddienst (Typ `specialUse`) prüft während des Zeitfensters etwa jede Sekunde per `UsageStatsManager.queryEvents`, welche App vorne ist, und zeigt das Overlay über `TYPE_APPLICATION_OVERLAY`. Außerhalb des Fensters wacht er nur etwa einmal pro Minute auf. Keine Bedienungshilfe (Accessibility) nötig.
 
+**Benachrichtigungs-Verlauf (Glocke oben rechts).** Alle Erinnerungen der letzten 30 Tage mit Uhrzeit, nach Tagen gruppiert, neueste zuerst – egal ob sie als Benachrichtigung oder nur in der App gezeigt wurden. Jeder Eintrag zeigt Titel, Text in der Tonalität, in der er gesendet wurde, und ob es Demo-Daten waren. Ein Zähler an der Glocke zeigt neue Einträge seit dem letzten Öffnen. Auch „Fokus-Session beendet“ wird jetzt protokolliert. (Datenbank-Version 2, Migration ergänzt Tonalität und Demo-Kennzeichen.)
+
 **Erscheinungsbild.** Umschalter Hell / Dunkel / Wie im System. Hell: Creme- und Soft-Grau-Flächen mit dunkler Schrift. Dunkel: tiefes Slate (`#0f172a`) mit dunklen Karten. Statusleisten-Symbole folgen der App-Einstellung.
 
 **Status-Glow.** Ring und Rahmen der Heute-Karte leuchten je nach Verbrauch: unter 70 % grün (`#22c55e`), 70–99 % orange (`#f59e0b`), ab 100 % rot (`#ef4444`). Zusätzlich steht der Status als Text daneben („Sicherer Bereich“, „Warnstufe“, „Limit überschritten“), damit er nicht nur an der Farbe hängt.
@@ -172,6 +174,7 @@ Der Status-Chip oben rechts zeigt immer genau einen Zustand:
 | Gesundheitscoach (Alternativen, Atemübung, Schlaf-Coach, Rückfragen) | funktioniert | CI-Build + Unit-Test | Nur allgemeine Tipps, keine Diagnosen |
 | Abendmodus mit Overlay-Sperre | funktioniert | CI-Build + Unit-Test (Zeitlogik) | Braucht Overlay-Erlaubnis und Nutzungszugriff; nicht auf Gerät verifiziert |
 | Theme-Umschalter Hell/Dunkel/System | funktioniert | CI-Build | |
+| Benachrichtigungs-Verlauf (Glocke) | funktioniert | CI-Build | Letzte 30 Tage, mit Uhrzeit und Zähler für neue Einträge |
 | Kategorien-Analyse | funktioniert | CI-Build + Unit-Test | Heute oder 7 Tage |
 | Sperre tagsüber / bei Limit | nicht umgesetzt | – | Gesperrt wird nur im Abendmodus |
 | KI-Coach | nicht umgesetzt | – | Interface `Coach` ist vorbereitet |

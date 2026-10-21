@@ -59,7 +59,9 @@ class CoachEvaluator(
         }
         val trigger = evaluation.send ?: return@withLock Result.NothingDue
         val canPost = notifier.canPost()
-        val inserted = notificationDao.insert(trigger.toEntity(now, shown = true, delivered = canPost)) != -1L
+        val inserted = notificationDao.insert(
+            trigger.toEntity(now, shown = true, delivered = canPost, voice = snapshot.prefs.voice, demo = snapshot.isDemo),
+        ) != -1L
         if (!inserted) return@withLock Result.NothingDue
         if (canPost) notifier.postCoach(trigger, snapshot.labels, snapshot.isDemo, snapshot.prefs.voice, snapshot.prefs.windDown.bedtime)
         notificationDao.deleteOlderThan(snapshot.date.minusDays(30).toString())

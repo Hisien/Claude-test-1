@@ -5,6 +5,7 @@ import com.scrollmate.app.data.db.NotificationRecordEntity
 import com.scrollmate.core.coach.CoachAction
 import com.scrollmate.core.coach.CoachMessage
 import com.scrollmate.core.coach.MessageKind
+import com.scrollmate.core.model.CoachVoice
 import com.scrollmate.core.model.FocusSession
 import com.scrollmate.core.model.FocusStatus
 import com.scrollmate.core.model.NotificationRecord
@@ -32,7 +33,13 @@ fun NotificationRecordEntity.message(): CoachMessage? {
     return CoachMessage(kind, act, percent, minutes, packageName)
 }
 
-fun CoachTrigger.toEntity(sentAt: Instant, shown: Boolean, delivered: Boolean): NotificationRecordEntity =
+fun CoachTrigger.toEntity(
+    sentAt: Instant,
+    shown: Boolean,
+    delivered: Boolean,
+    voice: CoachVoice? = null,
+    demo: Boolean = false,
+): NotificationRecordEntity =
     NotificationRecordEntity(
         key = key,
         date = key.substringBefore('|'),
@@ -47,6 +54,8 @@ fun CoachTrigger.toEntity(sentAt: Instant, shown: Boolean, delivered: Boolean): 
         percent = message.percent,
         minutes = message.minutes,
         packageName = message.packageName,
+        voice = voice?.name,
+        demo = demo,
     )
 
 fun FocusSessionEntity.toModel(): FocusSession = FocusSession(
@@ -66,3 +75,5 @@ fun FocusSession.toEntity(): FocusSessionEntity = FocusSessionEntity(
     status = status.name,
     reflection = reflection,
 )
+
+fun NotificationRecordEntity.voiceOrNull(): CoachVoice? = CoachVoice.values().firstOrNull { it.name == voice }

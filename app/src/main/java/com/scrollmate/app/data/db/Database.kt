@@ -1,6 +1,7 @@
 package com.scrollmate.app.data.db
 
 import android.content.Context
+import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Database
 import androidx.room.Entity
@@ -11,6 +12,8 @@ import androidx.room.Query
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.Upsert
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.coroutines.flow.Flow
 
 /** One row per local day, app and source. Kept because the OS only retains raw events for a few days. */
@@ -40,6 +43,9 @@ data class NotificationRecordEntity(
     val percent: Int?,
     val minutes: Int?,
     val packageName: String?,
+    /** Voice the message was sent in (null for records from version 1). */
+    val voice: String? = null,
+    @ColumnInfo(defaultValue = "0") val demo: Boolean = false,
 )
 
 @Entity(tableName = "focus_session")
@@ -106,6 +112,10 @@ interface NotificationRecordDao {
     @Query("SELECT * FROM notification_record WHERE date = :date AND shown = 1 ORDER BY sentAtMs DESC")
     fun shownOn(date: String): Flow<List<NotificationRecordEntity>>
 
+    /** Everything that was shown (notification or in-app), newest first – for the bell history. */
+    @Query("SELECT * FROM notification_record WHERE shown = 1 ORDER BY sentAtMs DESC LIMIT :limit")
+    fun recentShown(limit: Int): Flow<List<NotificationRecordEntity>>
+
     @Query("DELETE FROM notification_record WHERE date < :beforeDate")
     suspend fun deleteOlderThan(beforeDate: String)
 
@@ -141,7 +151,7 @@ interface FocusSessionDao {
         FocusSessionEntity::class,
         ReflectionEntity::class,
     ],
-    version = 1,
+    version = 2,
     exportSchema = false,
 )
 abstract class ScrollMateDatabase : RoomDatabase() {
@@ -152,6 +162,16 @@ abstract class ScrollMateDatabase : RoomDatabase() {
 
     companion object {
         fun create(context: Context): ScrollMateDatabase =
-            Room.databaseBuilder(context, ScrollMateDatabase::class.java, "scrollmate.db").build()
+            Room.databaseBuilder(context, ScrollMateDatabase::class.java, "scrollmate.db")
+                .addMigrations(MIGRATION_1_2)
+                .build()
+
+        /** v2: store voice and demo flag with each reminder for the notification history. */
+        val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE notification_record ADD COLUMN voice TEXT")
+                db.execSQL("ALTER TABLE notification_record ADD COLUMN demo INTEGER NOT NULL DEFAULT 0")
+            }
+        }
     }
 }

@@ -73,6 +73,9 @@ enum class RuleId {
     STRICT_REPEAT,
     CHECK_IN,
     WIND_DOWN,
+
+    /** Not evaluated by the rule engine; only used to log the "focus session ended" notification. */
+    FOCUS_END,
 }
 
 data class AppUsageEntry(

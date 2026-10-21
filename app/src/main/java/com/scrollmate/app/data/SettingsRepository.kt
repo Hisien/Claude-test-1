@@ -45,6 +45,15 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
         }
     }
 
+    /** When the user last opened the notification history (for the "new" badge). Not part of UserPreferences. */
+    val notificationsSeenAt: Flow<Long> = dataStore.data
+        .catch { e -> if (e is IOException) emit(emptyPreferences()) else throw e }
+        .map { it[K.NOTIFICATIONS_SEEN_AT] ?: 0L }
+
+    suspend fun markNotificationsSeen(atMs: Long) {
+        dataStore.edit { it[K.NOTIFICATIONS_SEEN_AT] = atMs }
+    }
+
     suspend fun clear() {
         dataStore.edit { it.clear() }
     }
@@ -140,6 +149,7 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
         val WD_LEAD = intPreferencesKey("wind_down_lead_min")
         val WD_BLOCKED = stringPreferencesKey("wind_down_blocked")
         val WD_PAUSED = stringPreferencesKey("wind_down_paused_for")
+        val NOTIFICATIONS_SEEN_AT = longPreferencesKey("notifications_seen_at")
     }
 
     companion object {

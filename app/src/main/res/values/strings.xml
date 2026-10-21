@@ -436,4 +436,13 @@
     <string name="cat_news">Informationsmedien &amp; News</string>
     <string name="cat_other">Sonstiges</string>
     <string name="categories_note">Die Zuordnung nutzt bekannte Apps und die Kategorie, die eine App selbst angibt.</string>
+
+    <!-- ===== Notification history (bell) ===== -->
+    <string name="notif_history_title">Benachrichtigungen</string>
+    <string name="notif_history_desc">Alle Erinnerungen der letzten 30 Tage – als Benachrichtigung oder nur in der App gezeigt.</string>
+    <string name="notif_history_empty">Noch keine Benachrichtigungen.</string>
+    <string name="notif_today">Heute</string>
+    <string name="notif_yesterday">Gestern</string>
+    <string name="cd_bell">Benachrichtigungen</string>
+    <string name="cd_bell_unread">Benachrichtigungen, %1$d neu</string>
 </resources>

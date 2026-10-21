@@ -11,6 +11,8 @@ import com.scrollmate.app.data.LauncherApp
 import com.scrollmate.app.data.UsageSnapshot
 import com.scrollmate.app.data.db.ReflectionEntity
 import com.scrollmate.app.data.message
+import com.scrollmate.app.data.voiceOrNull
+import com.scrollmate.core.model.CoachVoice
 import com.scrollmate.app.domain.CoachEvaluator
 import com.scrollmate.app.winddown.WindDownController
 import com.scrollmate.app.work.WorkScheduler
@@ -29,6 +31,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -42,6 +45,17 @@ import java.time.LocalDate
 enum class ManualCheckResult { SENT_NOTIFICATION, SENT_IN_APP, NOTHING_DUE, FAILED }
 
 data class InboxItem(val key: String, val sentAt: Instant, val message: CoachMessage, val asNotification: Boolean)
+
+/** One entry of the bell history: what was shown, when, in which voice. */
+data class HistoryItem(
+    val key: String,
+    val sentAt: Instant,
+    val message: CoachMessage,
+    val asNotification: Boolean,
+    val voice: CoachVoice?,
+    val demo: Boolean,
+    val appLabel: String?,
+)
 
 data class MainUiState(
     /** Null until DataStore delivered the first value. */
@@ -75,6 +89,36 @@ class MainViewModel(private val c: AppContainer) : ViewModel() {
             }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    /** All reminders of the last 30 days (notification or in-app), newest first. */
+    val notificationHistory: StateFlow<List<HistoryItem>> = c.database.notificationRecordDao().recentShown(300)
+        .map { rows ->
+            withContext(Dispatchers.IO) {
+                rows.mapNotNull { r ->
+                    r.message()?.let { m ->
+                        HistoryItem(
+                            key = r.key,
+                            sentAt = Instant.ofEpochMilli(r.sentAtMs),
+                            message = m,
+                            asNotification = r.deliveredAsNotification,
+                            voice = r.voiceOrNull(),
+                            demo = r.demo,
+                            appLabel = m.packageName?.let { c.installedApps.label(it) },
+                        )
+                    }
+                }
+            }
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    /** Entries newer than the last time the history was opened. */
+    val unreadNotifications: StateFlow<Int> = combine(notificationHistory, c.settings.notificationsSeenAt) { items, seen ->
+        items.count { it.sentAt.toEpochMilli() > seen }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0)
+
+    fun markNotificationsSeen() {
+        viewModelScope.launch { c.settings.markNotificationsSeen(c.clock.millis()) }
+    }
 
     val reflections: StateFlow<List<ReflectionEntity>> = c.database.reflectionDao().recent(5)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
